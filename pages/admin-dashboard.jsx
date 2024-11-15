@@ -12,18 +12,18 @@ import supabase from '@/lib/supabaseClient'
 const ProductForm = ({ product, onSubmit, buttonText }) => (
   <form onSubmit={onSubmit} className="space-y-4">
     <Input name="name" placeholder="Product Name" defaultValue={product?.name} required />
-    <Input name="vetsPrice" type="number" step="0.01" placeholder="Vets Price" defaultValue={product?.vetsPrice} required />
+    <Input name="vetsprice" type="number" step="0.01" placeholder="Vets Price" defaultValue={product?.vetsprice} required />
     <Input name="edgel" type="number" step="0.01" placeholder="Edgel Price" defaultValue={product?.edgel} required />
-    <Input name="jerwinAmy" type="number" step="0.01" placeholder="Jerwin/Amy Price" defaultValue={product?.jerwinAmy} required />
+    <Input name="jerwinamy" type="number" step="0.01" placeholder="Jerwin/Amy Price" defaultValue={product?.jerwinamy} required />
     <Input name="lacosta" type="number" step="0.01" placeholder="Lacosta Price" defaultValue={product?.lacosta} required />
-    <Input name="marilynLisa" type="number" step="0.01" placeholder="Marilyn/Lisa Price" defaultValue={product?.marilynLisa} required />
+    <Input name="marilynlisa" type="number" step="0.01" placeholder="Marilyn/Lisa Price" defaultValue={product?.marilynlisa} required />
     <Input name="mitchee" type="number" step="0.01" placeholder="Mitchee Price" defaultValue={product?.mitchee} required />
-    <Input name="acqPriceAfterDeal" type="number" step="0.01" placeholder="Acquisition Price After Deal" defaultValue={product?.acqPriceAfterDeal} required />
+    <Input name="acqpriceafterdeal" type="number" step="0.01" placeholder="Acquisition Price After Deal" defaultValue={product?.acqafterdeal} required />
     <Input name="deal" type="number" step="0.01" placeholder="Deal" defaultValue={product?.deal} required />
-    <Input name="supplierName" placeholder="Supplier Name" defaultValue={product?.supplierName} />
-    <Input name="acqPriceNew" type="number" step="0.01" placeholder="Acquisition Price (New)" defaultValue={product?.acqPriceNew} required />
-    <Input name="purchaseQty" type="number" placeholder="Purchase Quantity" defaultValue={product?.purchaseQty} required />
-    <Input name="dateOfPurchase" type="date" placeholder="Date of Purchase" defaultValue={product?.dateOfPurchase} required />
+    <Input name="suppliername" placeholder="Supplier Name" defaultValue={product?.suppliername} />
+    <Input name="acq_price_new" type="number" step="0.01" placeholder="Acquisition Price (New)" defaultValue={product?.acq_price_new} required />
+    <Input name="purchase_qty" type="number" placeholder="Purchase Quantity" defaultValue={product?.purchase_qty} required />
+    <Input name="purchase_date" type="date" placeholder="Date of Purchase" defaultValue={product?.purchase_date} required />
     <Button type="submit">{buttonText}</Button>
   </form>
 )
@@ -47,36 +47,63 @@ export default function AdminDashboard() {
     e.preventDefault()
     const formData = new FormData(e.target)
     const productData = Object.fromEntries(formData.entries())
-
-    productData.vetsPrice = parseFloat(productData.vetsPrice)
+  
+    // Parse numeric fields
+    productData.vetsprice = parseFloat(productData.vetsprice)
     productData.edgel = parseFloat(productData.edgel)
-    productData.jerwinAmy = parseFloat(productData.jerwinAmy)
+    productData.jerwinamy = parseFloat(productData.jerwinamy)
     productData.lacosta = parseFloat(productData.lacosta)
-    productData.marilynLisa = parseFloat(productData.marilynLisa)
+    productData.marilynlisa = parseFloat(productData.marilynlisa)
     productData.mitchee = parseFloat(productData.mitchee)
-    productData.acqPriceAfterDeal = parseFloat(productData.acqPriceAfterDeal)
+    productData.acqpriceafterdeal = parseFloat(productData.acqpriceafterdeal)
     productData.deal = parseFloat(productData.deal)
-    productData.acqPriceNew = parseFloat(productData.acqPriceNew)
-    productData.purchaseQty = parseInt(productData.purchaseQty, 10)
-
+    productData.acq_price_new = parseFloat(productData.acq_price_new)
+    productData.purchase_qty = parseInt(productData.purchase_qty, 10)
+    productData.suppliername = productData.suppliername // No parsing needed for string fields
+    productData.purchase_date = productData.purchase_date // Leave as string from the input field
+  
+    let responseData, error
+  
     if (isEditing) {
-      const { error } = await supabase
+      const result = await supabase
         .from('products')
         .update(productData)
         .eq('id', editingProduct.id)
-
-      if (error) console.error('Error updating product:', error)
-      else {
-        setProducts(products.map(p => (p.id === editingProduct.id ? { ...p, ...productData } : p)))
-        setEditingProduct(null)
-      }
+      
+      error = result.error
+      responseData = result.data
     } else {
-      const { data, error } = await supabase.from('products').insert([productData])
-      if (error) console.error('Error adding product:', error)
-      else setProducts([...products, ...data])
+      const result = await supabase.from('products').insert([productData])
+  
+      error = result.error
+      responseData = result.data
     }
+  
+    if (error) {
+      console.error('Error:', error.message)
+      console.error('Details:', error.details)
+      return
+    }
+  
+    // Ensure the UI reflects the updated data after insert/update
+  if (Array.isArray(responseData)) {
+    setProducts(prevProducts => [...prevProducts, ...responseData])  // Updating state with new data
+  } else {
+    console.error('Unexpected response data:', responseData)
+  }
+
+  // Optionally fetch the updated list of products again
+  const { data: refreshedProducts, error: fetchError } = await supabase.from('products').select('*')
+  if (fetchError) {
+    console.error('Error fetching updated products:', fetchError.message)
+    return
+  }
+  setProducts(refreshedProducts)  // Update the state with the latest data
+  
     e.target.reset()
   }
+  
+  
 
   const handleDelete = async (id) => {
     const { error } = await supabase.from('products').delete().eq('id', id)
@@ -134,27 +161,33 @@ export default function AdminDashboard() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredProducts.map((product) => (
-                    <TableRow key={product.id}>
-                      <TableCell>{product.name}</TableCell>
-                      <TableCell>{product.vetsPrice.toFixed(2)}</TableCell>
-                      <TableCell>{product.edgel.toFixed(2)}</TableCell>
-                      <TableCell>{product.jerwinAmy.toFixed(2)}</TableCell>
-                      <TableCell>{product.lacosta.toFixed(2)}</TableCell>
-                      <TableCell>{product.marilynLisa.toFixed(2)}</TableCell>
-                      <TableCell>{product.mitchee.toFixed(2)}</TableCell>
-                      <TableCell>{product.acqPriceAfterDeal.toFixed(2)}</TableCell>
-                      <TableCell>{product.acqPriceNew.toFixed(2)}</TableCell>
-                      <TableCell>{product.deal.toFixed(2)}</TableCell>
-                      <TableCell>{product.purchaseQty}</TableCell>
-                      <TableCell>{product.dateOfPurchase}</TableCell>
-                      <TableCell>
-                        <Button variant="ghost" onClick={() => setEditingProduct(product)}><Edit size={18} /></Button>
-                        <Button variant="ghost" onClick={() => handleDelete(product.id)}><Trash2 size={18} /></Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
+  {filteredProducts.map((product) => (
+    <TableRow key={product.id}>
+      <TableCell>{product.name}</TableCell>
+      <TableCell>{(product.vetsprice || 0).toFixed(2)}</TableCell>
+      <TableCell>{(product.edgel || 0).toFixed(2)}</TableCell>
+      <TableCell>{(product.jerwinamy || 0).toFixed(2)}</TableCell>
+      <TableCell>{(product.lacosta || 0).toFixed(2)}</TableCell>
+      <TableCell>{(product.marilynlisa || 0).toFixed(2)}</TableCell>
+      <TableCell>{(product.mitchee || 0).toFixed(2)}</TableCell>
+      <TableCell>{(product.acqpriceafterdeal || 0).toFixed(2)}</TableCell>
+      <TableCell>{(product.acq_price_new || 0).toFixed(2)}</TableCell>
+      <TableCell>{(product.deal || 0).toFixed(2)}</TableCell>
+      <TableCell>{product.purchase_qty || 0}</TableCell>
+      <TableCell>{product.purchase_date || 'N/A'}</TableCell>
+      <TableCell>
+        <Button variant="ghost" onClick={() => setEditingProduct(product)}>
+          <Edit size={18} />
+        </Button>
+        <Button variant="ghost" onClick={() => handleDelete(product.id)}>
+          <Trash2 size={18} />
+        </Button>
+      </TableCell>
+    </TableRow>
+  ))}
+</TableBody>
+
+
               </Table>
             </TabsContent>
             <TabsContent value="add">
