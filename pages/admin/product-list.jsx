@@ -1,4 +1,4 @@
-/* import ProductList from '../../components/admin/ProductList';
+/* import ProductList from '../../components/admin/ProductList'; */
 
 export default function ProductListPage() {
   return (
@@ -6,4 +6,4 @@ export default function ProductListPage() {
       <ProductList />
     </div>
   );
-} */
+} 

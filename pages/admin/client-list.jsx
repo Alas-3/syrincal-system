@@ -1,4 +1,4 @@
-/* import ClientList from '../../components/admin/ClientList';
+/* import ClientList from '../../components/admin/ClientList';*/
 
 export default function ClientListPage() {
   return (
@@ -7,4 +7,3 @@ export default function ClientListPage() {
     </div>
   );
 }
-*/
