@@ -3,7 +3,7 @@
 export default function ProductListPage() {
   return (
     <div className="container mx-auto p-4">
-      <ProductList />
+      {/* <ProductList /> */}
     </div>
   );
 } 
