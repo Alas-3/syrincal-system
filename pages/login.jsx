@@ -68,7 +68,7 @@ export default function LoginPage() {
         router.push('/manager-dashboard')
         break
       case 'agent':
-        router.push('/agent-dashboard')
+        router.push('/client-homepage')
         break
       default:
         setError('Unknown role')

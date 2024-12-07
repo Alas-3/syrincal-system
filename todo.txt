@@ -1,0 +1,36 @@
+---------------------------------------------------------
+for ADMIN side
+
+-polish up admin dashboard ui
+-add tracking of products
+    -view placed orders
+    -view pending payments
+    -view current inventory stock
+    -improve assigning of product prices for different clients
+(more yet to conceptualize)
+
+----------------------------------------------------------
+for CLIENT side
+
+-improve client homepage ui/ux
+    -find more e-commerce ui inspi
+    -current ui/ux feels out dated
+
+-link prices of products for client-specific users (i.e. diff clients have diff prices)
+-integrate search feature
+-fix filter chips
+    -fix its ui
+    -integrate its function
+
+? take and add picture of products (around 500 products)
+    -? find a better easier way thatll still be feasible and not tedious to integrate
+
+-----------------------------------------------------------
+MANAGER
+-yet to be created
+? possible change this for the role of the delivery men (i.e. like lazada to confirm products delivered when/where/who)
+(conceptualize more)
+
+-----------------------------------------------------------
+for BACKEND
+-create the table for prices of products specific to each client
