@@ -1,6 +1,8 @@
 ---------------------------------------------------------
 for ADMIN side
 
+(-goal here is to able to view pending/delivered products. overall statistics of the company. edit prices/deals/products. etc(to find out ig)-)
+
 -polish up admin dashboard ui
 -add tracking of products
     -view placed orders
@@ -11,6 +13,8 @@ for ADMIN side
 
 ----------------------------------------------------------
 for CLIENT side
+
+(-goal here is to become like foodpanda but for vet products-)
 
 -improve client homepage ui/ux
     -find more e-commerce ui inspi
@@ -34,3 +38,5 @@ MANAGER
 -----------------------------------------------------------
 for BACKEND
 -create the table for prices of products specific to each client
+
+-add paymongo(?) for payments

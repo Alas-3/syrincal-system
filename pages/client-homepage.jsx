@@ -20,12 +20,12 @@ const products = [
   { id: 8, name: 'Pro-Clean Dental Kit', price: 29.99, image: '/placeholder.svg?height=200&width=200', category: 'Dental', rating: 4.9 }
 ]
 
-const categories = ['All', 'Vaccines', 'Medications', 'Supplies', 'Cleaning', 'Supplements', 'Dental']
+const categories = ['All', 'Vaccines', 'Medications', 'Supplements']
 
 const testimonials = [
-  { id: 1, name: 'Dr. Sarah Johnson', role: 'Veterinarian', content: 'VetVials has revolutionized how I stock my clinic. The quality and reliability of their products are unmatched.' },
-  { id: 2, name: 'Dr. Michael Chen', role: 'Animal Hospital Director', content: 'The convenience and range of products offered by VetVials have significantly improved our operational efficiency.' },
-  { id: 3, name: 'Dr. Emily Rodriguez', role: 'Wildlife Veterinarian', content: 'Even in remote locations, I can count on VetVials for timely delivery of crucial supplies. It\'s a game-changer for wildlife care.' },
+  { id: 1, name: 'Dr. Sarah Johnson', role: 'Veterinarian', content: 'Syrincal has revolutionized how I stock my clinic. The quality and reliability of their products are unmatched.' },
+  { id: 2, name: 'Dr. Michael Chen', role: 'Animal Hospital Director', content: 'The convenience and range of products offered by Syrincal have significantly improved our operational efficiency.' },
+  { id: 3, name: 'Dr. Emily Rodriguez', role: 'Wildlife Veterinarian', content: 'Even in remote locations, I can count on Syrincal for timely delivery of crucial supplies. It\'s a game-changer for wildlife care.' },
 ]
 
 export default function Home() {
@@ -70,7 +70,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            VetVials
+            Syrincal
           </motion.h1>
           <div className="flex items-center space-x-4">
             <div className="hidden md:block">
@@ -184,7 +184,7 @@ export default function Home() {
         </section>
 
         <section className="mb-16">
-          <h2 className="text-3xl font-semibold text-gray-800 mb-8 text-center">Why Choose VetVials?</h2>
+          <h2 className="text-3xl font-semibold text-gray-800 mb-8 text-center">Why Choose Syrincal?</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <Card className="bg-white shadow-lg border-none">
               <CardContent className="p-6 flex flex-col items-center text-center">
@@ -213,13 +213,13 @@ export default function Home() {
         <section className="mb-16">
           <h2 className="text-3xl font-semibold text-gray-800 mb-8 text-center">Our Products</h2>
           <Tabs defaultValue="All" className="w-full">
-            <TabsList className="mb-8 flex flex-wrap justify-center">
+            <TabsList className="m-2 md:mb-8 flex flex-wrap justify-center">
               {categories.map((category) => (
                 <TabsTrigger
                   key={category}
                   value={category}
                   onClick={() => setSelectedCategory(category)}
-                  className="px-4 py-2 m-1 text-blue-600 bg-white rounded-full shadow-md hover:bg-blue-50 transition-colors"
+                  className="px-4 py-2 text-blue-600 bg-white rounded-full shadow-md hover:bg-blue-50 transition-colors"
                 >
                   {category}
                 </TabsTrigger>
@@ -286,7 +286,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
-              <h3 className="text-2xl font-semibold mb-4">VetVials</h3>
+              <h3 className="text-2xl font-semibold mb-4">Syrincal Trading OPC</h3>
               <p className="text-blue-200">Empowering veterinary professionals with top-quality supplies and exceptional service. Your trusted partner in animal care.</p>
             </div>
             <div>
@@ -300,13 +300,13 @@ export default function Home() {
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
-              <p className="text-blue-200">Email: support@vetvials.com</p>
+              <p className="text-blue-200">Email: support@syrincal.com</p>
               <p className="text-blue-200">Phone: (555) 123-4567</p>
-              <p className="text-blue-200 mt-4">123 Veterinary Lane, Animal City, VC 12345</p>
+              <p className="text-blue-200 mt-4">123 Veterinary Lane, Vet City, VC 12345</p>
             </div>
           </div>
           <div className="mt-8 pt-8 border-t border-blue-800 text-center text-blue-200">
-            <p>&copy; 2023 VetVials. All rights reserved.</p>
+            <p>&copy; 2024 Syrincal Trading OPC. All rights reserved.</p>
           </div>
         </div>
       </footer>

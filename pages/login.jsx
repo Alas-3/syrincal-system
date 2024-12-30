@@ -80,8 +80,8 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gradient-to-br from-teal-100 to-blue-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-2xl transition-all duration-500 ease-in-out hover:shadow-3xl">
         <div className="text-center">
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Clinic Inventory</h2>
-          <p className="mt-2 text-sm text-gray-600">Sign in to manage your inventory</p>
+          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Syrincal Trading OPC</h2>
+          <p className="mt-2 text-sm text-gray-600">Welcome to Syrincal Trading OPC</p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">

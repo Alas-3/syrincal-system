@@ -129,7 +129,7 @@ export default function AdminDashboard() {
       <div className="container mx-auto p-6">
         <header className="mb-8">
           <h1 className="text-4xl font-bold text-teal-800 flex items-center">
-            <Stethoscope className="mr-2" /> Clinic Inventory Management
+            <Stethoscope className="mr-2" /> Syrincal System Management
           </h1>
         </header>
         <Card className="bg-white shadow-xl rounded-xl overflow-hidden">
