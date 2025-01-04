@@ -29,6 +29,10 @@ for CLIENT side
 ? take and add picture of products (around 500 products)
     -? find a better easier way thatll still be feasible and not tedious to integrate
 
+
++ managed to add functionality where it fetches the data for products and prices for specific clients
+    - need to polish up by excluding or products with no prices for that client/user will no longer be displayed in the page to avoid not needed products for that specific client
+
 -----------------------------------------------------------
 MANAGER
 -yet to be created
@@ -40,3 +44,5 @@ for BACKEND
 -create the table for prices of products specific to each client
 
 -add paymongo(?) for payments
+
++ refactored supabase client to enable fetching of tailored products and prices based on account thats logged in

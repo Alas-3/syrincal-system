@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { ArrowRight, Lock, Mail } from 'lucide-react'
 import { useRouter } from 'next/router'
-import supabase from '@/lib/supabaseClient'
+import { supabase } from '../lib/supabaseClient'
 
 
 export default function LoginPage() {

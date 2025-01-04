@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import supabase from '@/lib/supabaseClient'
+import { supabase } from '../lib/supabaseClient'
 
 const ProductForm = ({ product, onSubmit, buttonText }) => (
   <form onSubmit={onSubmit} className="space-y-4 bg-white p-6 rounded-lg shadow-md">
