@@ -11,6 +11,7 @@ for ADMIN side
     -improve assigning of product prices for different clients
 (more yet to conceptualize)
 
+
 ----------------------------------------------------------
 for CLIENT side
 
@@ -46,3 +47,10 @@ for BACKEND
 -add paymongo(?) for payments
 
 + refactored supabase client to enable fetching of tailored products and prices based on account thats logged in
+
+
+
+-------------------------------------- ! REMINDER ! --------------------------------------
+
+Next order of business is to update the ui for the client dashboard first 
+since we refactored it to connect the products and prices to different client accounts
