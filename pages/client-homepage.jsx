@@ -2,7 +2,20 @@
 
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import { ShoppingCart, Search, Menu, X } from 'lucide-react'
+import { ShoppingCart, Search, Menu, X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+
+// Mapping of product names to image URLs
+const productImages = {
+  'Product A': '/images/product-a.jpg',
+  'Product B': '/images/product-b.jpg',
+  'Product C': '/images/product-c.jpg',
+  'Prodox Forte 100ml': '/images/prodoxforte100ml.jpeg',
+  // Add more products as needed
+};
+
+// Default image if no matching product is found
+const defaultImage = '/images/default-product.jpg';
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -11,6 +24,7 @@ export default function Home() {
   const [cart, setCart] = useState([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   // Function to determine the pricing column based on email
   const getPriceColumn = (email) => {
@@ -19,30 +33,38 @@ export default function Home() {
     return pricingColumns.includes(username) ? username : 'vetsprice';
   };
 
-  // Function to fetch products
   const fetchProducts = async (email) => {
     const priceColumn = getPriceColumn(email);
-
+  
     try {
       const { data, error } = await supabase
         .from('products')
         .select(`name, ${priceColumn}`);
-
+  
       if (error) {
         throw error;
       }
-
-      // Map the fetched data into an array of product objects with names and prices
-      return data.map((item) => ({
-        name: item.name,
-        price: item[priceColumn],  // Dynamically use the price column based on the email
-      }));
+  
+      // Normalize product names for comparison
+      return data.map((item) => {
+        const normalizedName = item.name.trim().toLowerCase();
+        const matchedImage = Object.keys(productImages).find(
+          (key) => key.trim().toLowerCase() === normalizedName
+        );
+  
+        return {
+          name: item.name,
+          price: item[priceColumn],
+          image: matchedImage ? productImages[matchedImage] : defaultImage,
+        };
+      });
     } catch (err) {
       console.error('Error fetching products:', err);
       setError('Failed to fetch products. Please try again later.');
       return [];
     }
   };
+  
 
   // Fetch products on page load
   useEffect(() => {
@@ -90,6 +112,8 @@ export default function Home() {
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const featuredProducts = products.filter(product => product.image !== defaultImage).slice(0, 3);
+
   // Render loading, error, or product list
   if (loading) {
     return (
@@ -104,10 +128,17 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       <header className="bg-white shadow-md sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-blue-600">VetVials</h1>
+          <motion.h1 
+            className="text-3xl font-bold text-blue-600"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            VetVials
+          </motion.h1>
           <div className="flex items-center space-x-4">
             <div className="hidden md:block">
               <input
@@ -124,9 +155,14 @@ export default function Home() {
             <button className="text-gray-600 hover:text-blue-600 transition-colors relative">
               <ShoppingCart className="w-6 h-6" />
               {cart.length > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                <motion.span 
+                  className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                >
                   {cart.reduce((total, item) => total + item.quantity, 0)}
-                </span>
+                </motion.span>
               )}
             </button>
             <button 
@@ -137,31 +173,97 @@ export default function Home() {
             </button>
           </div>
         </div>
-        {isMenuOpen && (
-          <nav className="md:hidden bg-white">
-            <ul className="py-2 px-4 space-y-2">
-              <li>
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </li>
-              <li><a href="#" className="block py-2 text-gray-600 hover:text-blue-600">Products</a></li>
-              <li><a href="#" className="block py-2 text-gray-600 hover:text-blue-600">About</a></li>
-              <li><a href="#" className="block py-2 text-gray-600 hover:text-blue-600">Contact</a></li>
-            </ul>
-          </nav>
-        )}
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.nav 
+              className="md:hidden bg-white"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <ul className="py-2 px-4 space-y-2">
+                <li>
+                  <input
+                    type="text"
+                    placeholder="Search products..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </li>
+                <li><a href="#" className="block py-2 text-gray-600 hover:text-blue-600">Products</a></li>
+                <li><a href="#" className="block py-2 text-gray-600 hover:text-blue-600">About</a></li>
+                <li><a href="#" className="block py-2 text-gray-600 hover:text-blue-600">Contact</a></li>
+              </ul>
+            </motion.nav>
+          )}
+        </AnimatePresence>
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <section className="mb-16">
+          <motion.h2 
+            className="text-4xl font-semibold text-gray-800 mb-8 text-center"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            Featured Products
+          </motion.h2>
+          <div className="relative">
+            <div className="overflow-hidden rounded-lg shadow-lg">
+              <motion.div 
+                className="flex transition-transform duration-500 ease-in-out"
+                style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+              >
+                {featuredProducts.map((product) => (
+                  <div key={product.name} className="w-full flex-shrink-0">
+                    <div className="relative h-64 sm:h-96">
+                      <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
+                      <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                        <h3 className="text-3xl font-bold mb-2">{product.name}</h3>
+                        <p className="text-xl mb-4">₱{isNaN(product.price) ? 'Price unavailable' : Number(product.price).toFixed(2)}</p>
+                        <button 
+                          onClick={() => addToCart(product)}
+                          className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md transition-colors duration-300"
+                        >
+                          Add to Cart
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </motion.div>
+            </div>
+            <button
+              className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-white/80 hover:bg-white text-blue-600 p-2 rounded-full shadow-md"
+              onClick={() => setCurrentSlide((prev) => (prev === 0 ? featuredProducts.length - 1 : prev - 1))}
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+            <button
+              className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-white/80 hover:bg-white text-blue-600 p-2 rounded-full shadow-md"
+              onClick={() => setCurrentSlide((prev) => (prev === featuredProducts.length - 1 ? 0 : prev + 1))}
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+          </div>
+        </section>
+
         <h2 className="text-3xl font-bold text-gray-800 mb-6">Our Products</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredProducts.map((product) => (
-            <div key={product.name} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+            <motion.div 
+              key={product.name} 
+              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              whileHover={{ scale: 1.05 }}
+            >
+              <img src={product.image} alt={product.name} className="w-full h-48 object-cover" />
               <div className="p-4">
                 <h3 className="text-xl font-semibold text-gray-800 mb-2">{product.name}</h3>
                 <p className="text-gray-600 mb-4">
@@ -174,7 +276,7 @@ export default function Home() {
                   Add to Cart
                 </button>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </main>

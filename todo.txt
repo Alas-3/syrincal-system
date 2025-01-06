@@ -54,3 +54,7 @@ for BACKEND
 
 Next order of business is to update the ui for the client dashboard first 
 since we refactored it to connect the products and prices to different client accounts
+
+NOTE: filter out duplicate data of products, and exclude ones without prices for that client
+
+1/6 - added image to a product, starting from their
