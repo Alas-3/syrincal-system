@@ -11,6 +11,7 @@ const productImages = {
   'Product B': '/images/product-b.jpg',
   'Product C': '/images/product-c.jpg',
   'Prodox Forte 100ml': '/images/prodoxforte100ml.jpeg',
+  'Sync Immune 100ml': 'https://www.shutterstock.com/image-vector/icon-plastic-medical-syringe-bottle-600nw-1662868666.jpg',
   // Add more products as needed
 };
 
