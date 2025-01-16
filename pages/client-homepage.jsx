@@ -138,7 +138,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            VetVials
+            Syrincal
           </motion.h1>
           <div className="flex items-center space-x-4">
             <div className="hidden md:block">
