@@ -296,7 +296,7 @@ const handleDeleteProduct = async (id) => {
         );
       })
       .forEach((product) => {
-        // Include purchase_date in the key to ensure uniqueness
+        // Include purchase date in the key
         const key = `${product.id}-${product.name}-${product.acq_price_new}-${product.vetsprice}-${product.purchase_date}`;
         if (!batches[key]) {
           batches[key] = {
@@ -587,7 +587,7 @@ const handleDeleteProduct = async (id) => {
                   </TableHeader>
                   <TableBody>
                     {groupInventoryBatches().map((batch) => (
-                      <TableRow key={`${batch.name}-${batch.acq_price}`}>
+                      <TableRow key={`${batch.name}-${batch.acq_price}-${batch.batches[0].purchase_date}`}>
                         <TableCell className="font-medium">
                           {batch.name}
                         </TableCell>
