@@ -646,14 +646,18 @@ export default function InventoryManager() {
       if (!performance[key]) {
         performance[key] = {
           name: sale.productsdata.name,
-          sellingPrice: sale.sale_price, // Include selling price
+          sellingPrice: sale.sale_price, // Selling price per piece
+          acquisitionPrice: sale.productsdata.acq_price_new, // Cost per piece
           totalSales: 0,
           totalRevenue: 0,
+          totalCost: 0, // Total cost for all pieces sold
           totalProfit: 0,
         };
       }
       performance[key].totalSales += sale.quantity;
       performance[key].totalRevenue += sale.quantity * sale.sale_price;
+      performance[key].totalCost +=
+        sale.quantity * sale.productsdata.acq_price_new; // Total cost
       performance[key].totalProfit +=
         (sale.sale_price - sale.productsdata.acq_price_new) * sale.quantity;
     });
@@ -1341,9 +1345,11 @@ export default function InventoryManager() {
                           <TableHeader>
                             <TableRow>
                               <TableHead>Product</TableHead>
-                              <TableHead>Selling Price</TableHead>
+                              <TableHead>Selling Price Per Piece</TableHead>
+                              <TableHead>Cost Per Piece</TableHead>
                               <TableHead>Total Sales</TableHead>
                               <TableHead>Total Revenue</TableHead>
+                              <TableHead>Total Cost</TableHead>
                               <TableHead>Total Profit</TableHead>
                             </TableRow>
                           </TableHeader>
@@ -1356,9 +1362,15 @@ export default function InventoryManager() {
                                 <TableCell>
                                   ₱{performance.sellingPrice?.toFixed(2)}
                                 </TableCell>
+                                <TableCell>
+                                  ₱{performance.acquisitionPrice?.toFixed(2)}
+                                </TableCell>
                                 <TableCell>{performance.totalSales}</TableCell>
                                 <TableCell>
                                   ₱{performance.totalRevenue.toFixed(2)}
+                                </TableCell>
+                                <TableCell>
+                                  ₱{performance.totalCost.toFixed(2)}
                                 </TableCell>
                                 <TableCell
                                   className={
