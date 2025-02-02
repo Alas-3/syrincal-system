@@ -49,9 +49,10 @@ import { supabase } from "../lib/supabaseClient";
 />;
 
 // ProductForm Component
-const ProductForm = ({ product, onSubmit, buttonText }) => {
+const ProductForm = ({ product, onSubmit, buttonText, onCancel }) => {
   const initialDate =
     product?.purchase_date || new Date().toISOString().split("T")[0];
+  const formRef = React.useRef(null);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -62,11 +63,27 @@ const ProductForm = ({ product, onSubmit, buttonText }) => {
     e.target.reset();
   };
 
+  const handleClear = () => {
+    if (formRef.current) {
+      formRef.current.reset();
+    }
+  };
+
   return (
     <form
+      ref={formRef}
       onSubmit={handleSubmit}
-      className="space-y-4 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm"
+      className="space-y-4 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm relative"
     >
+      {/* Clear Button */}
+      <button
+        type="button"
+        onClick={handleClear}
+        className="absolute top-2 right-2 p-1 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+      >
+        <Trash2 className="h-4 w-4" />
+      </button>
+
       {/* Product Name */}
       <div>
         <label
@@ -179,13 +196,24 @@ const ProductForm = ({ product, onSubmit, buttonText }) => {
         />
       </div>
 
-      {/* Submit Button */}
-      <Button
-        type="submit"
-        className="w-full bg-teal-500 hover:bg-teal-600 dark:bg-teal-600 dark:hover:bg-teal-700 text-white"
-      >
-        {buttonText}
-      </Button>
+      {/* Submit and Cancel Buttons */}
+      <div className="flex gap-2">
+        <Button
+          type="submit"
+          className="w-full bg-teal-500 hover:bg-teal-600 dark:bg-teal-600 dark:hover:bg-teal-700 text-white"
+        >
+          {buttonText}
+        </Button>
+        {onCancel && (
+          <Button
+            type="button"
+            className="w-full bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-700 text-white"
+            onClick={onCancel}
+          >
+            Cancel
+          </Button>
+        )}
+      </div>
     </form>
   );
 };
