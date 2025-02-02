@@ -396,6 +396,7 @@ const SaleForm = ({ products, onSubmit, sale, onCancel }) => {
         >
           {sale ? "Update Sale" : "Record Sale"}
         </Button>
+        {/* Show Cancel button only in edit mode */}
         {onCancel && (
           <Button
             type="button"
@@ -787,12 +788,16 @@ export default function InventoryManager() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-4 sm:p-6">
-                <ProductForm
-  product={editingProduct}
-  onSubmit={(e) => handleProductSubmit(e, !!editingProduct)}
-  buttonText={editingProduct ? "Update Product" : "Add Product"}
-  onCancel={editingProduct ? () => setEditingProduct(null) : undefined} // Only pass onCancel in edit mode
-/>
+                  <ProductForm
+                    product={editingProduct}
+                    onSubmit={(e) => handleProductSubmit(e, !!editingProduct)}
+                    buttonText={
+                      editingProduct ? "Update Product" : "Add Product"
+                    }
+                    onCancel={
+                      editingProduct ? () => setEditingProduct(null) : undefined
+                    } // Only pass onCancel in edit mode
+                  />
                 </CardContent>
               </Card>
 
@@ -932,6 +937,9 @@ export default function InventoryManager() {
                       products={products}
                       onSubmit={handleEditSale}
                       sale={editingSale}
+                      onCancel={
+                        editingSale ? () => setEditingSale(null) : undefined
+                      } // Only pass onCancel in edit mode
                     />
                   </CardContent>
                 </Card>
