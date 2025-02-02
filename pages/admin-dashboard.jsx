@@ -737,8 +737,8 @@ export default function InventoryManager() {
           <div className="space-y-6">
             {/* Products Tab - Updated Layout */}
             <TabsContent value="products" className="space-y-6">
-              <Card className="bg-white dark:bg-gray-800 shadow-sm">
-                <CardHeader className="border-b border-gray-200 dark:border-gray-700">
+              <Card className="bg-white dark:bg-gray-800 shadow-sm dark:border-neutral-400">
+                <CardHeader className="border-b border-gray-200 dark:border-neutral-400">
                   <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200">
                     {editingProduct ? "Edit Product" : "Add New Product"}
                   </CardTitle>
@@ -754,8 +754,8 @@ export default function InventoryManager() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-white dark:bg-gray-800 shadow-sm">
-                <CardHeader className="border-b border-gray-200 dark:border-gray-700">
+              <Card className="bg-white dark:bg-gray-800  dark:border-neutral-400 shadow-sm">
+                <CardHeader className="border-b border-gray-200 dark:border-neutral-400">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200">
                       Product List
@@ -765,7 +765,7 @@ export default function InventoryManager() {
                         value={selectedProductYear}
                         onValueChange={setSelectedProductYear}
                       >
-                        <SelectTrigger className="w-[120px] bg-white dark:bg-gray-700">
+                        <SelectTrigger className="w-[120px] bg-white dark:bg-gray-700 dark:border-neutral-400">
                           <SelectValue placeholder="Year" />
                         </SelectTrigger>
                         <SelectContent className="dark:bg-gray-700">
@@ -784,7 +784,7 @@ export default function InventoryManager() {
                         value={selectedProductMonth}
                         onValueChange={setSelectedProductMonth}
                       >
-                        <SelectTrigger className="w-[120px] bg-white dark:bg-gray-700">
+                        <SelectTrigger className="w-[120px] bg-white dark:bg-gray-700 dark:border-neutral-400">
                           <SelectValue placeholder="Month" />
                         </SelectTrigger>
                         <SelectContent className="dark:bg-gray-700">
@@ -849,7 +849,7 @@ export default function InventoryManager() {
                               <TableCell>
                                 <div className="flex gap-2">
                                   <Button
-                                    className="bg-white text-black"
+                                    className="dark:bg-neutral-300 text-black"
                                     size="sm"
                                     variant="outline"
                                     onClick={() => setEditingProduct(product)}
@@ -879,8 +879,8 @@ export default function InventoryManager() {
             {/* Sales Tab - Updated Layout */}
             <TabsContent value="sales" className="space-y-6">
               {editingSale ? (
-                <Card className="bg-white dark:bg-gray-800 shadow-sm">
-                  <CardHeader className="border-b border-gray-200 dark:border-gray-700">
+                <Card className="bg-white dark:bg-gray-800 dark:border-neutral-400 shadow-sm">
+                  <CardHeader className="border-b border-gray-200 dark:border-neutral-400">
                     <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200">
                       Edit Sale
                     </CardTitle>
@@ -894,8 +894,8 @@ export default function InventoryManager() {
                   </CardContent>
                 </Card>
               ) : (
-                <Card className="bg-white dark:bg-gray-800 shadow-sm">
-                  <CardHeader className="border-b border-gray-200 dark:border-gray-700">
+                <Card className="bg-white dark:bg-gray-800 dark:border-neutral-400 shadow-sm">
+                  <CardHeader className="border-b border-gray-200 dark:border-neutral-400">
                     <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200">
                       Record New Sale
                     </CardTitle>
@@ -907,8 +907,8 @@ export default function InventoryManager() {
               )}
 
               {/* Sales History Card */}
-              <Card className="bg-white dark:bg-gray-800 shadow-sm">
-                <CardHeader className="border-b border-gray-200 dark:border-gray-700">
+              <Card className="bg-white dark:bg-gray-800 dark:border-neutral-400 shadow-sm">
+                <CardHeader className="border-b border-gray-200 dark:border-neutral-400">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200">
                       Sales History
@@ -919,7 +919,7 @@ export default function InventoryManager() {
                         value={selectedYear}
                         onValueChange={setSelectedYear}
                       >
-                        <SelectTrigger className="w-[120px] bg-white dark:bg-gray-700">
+                        <SelectTrigger className="w-[120px] bg-white dark:bg-gray-700 dark:border-neutral-400">
                           <SelectValue placeholder="Year" />
                         </SelectTrigger>
                         <SelectContent className="dark:bg-gray-700">
@@ -938,7 +938,7 @@ export default function InventoryManager() {
                         value={selectedMonth}
                         onValueChange={setSelectedMonth}
                       >
-                        <SelectTrigger className="w-[120px] bg-white dark:bg-gray-700">
+                        <SelectTrigger className="w-[120px] bg-white dark:bg-gray-700 dark:border-neutral-400">
                           <SelectValue placeholder="Month" />
                         </SelectTrigger>
                         <SelectContent className="dark:bg-gray-700">
@@ -1002,6 +1002,7 @@ export default function InventoryManager() {
                                 <div className="flex gap-2">
                                   <Button
                                     size="sm"
+                                    className="dark:bg-neutral-300 text-black"
                                     variant="outline"
                                     onClick={() => setEditingSale(sale)}
                                   >
@@ -1027,8 +1028,8 @@ export default function InventoryManager() {
 
             {/* Inventory Tab - Updated Layout */}
             <TabsContent value="inventory">
-              <Card className="bg-white dark:bg-gray-800 shadow-sm">
-                <CardHeader className="border-b border-gray-200 dark:border-gray-700">
+              <Card className="bg-white dark:bg-gray-800 dark:border-neutral-400 shadow-sm">
+                <CardHeader className="border-b border-gray-200 dark:border-neutral-400">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200">
                       Inventory Overview
@@ -1038,7 +1039,7 @@ export default function InventoryManager() {
                         value={selectedYear}
                         onValueChange={setSelectedYear}
                       >
-                        <SelectTrigger className="w-[120px] bg-white dark:bg-gray-700">
+                        <SelectTrigger className="w-[120px] bg-white dark:bg-gray-700 dark:border-neutral-400">
                           <SelectValue placeholder="Year" />
                         </SelectTrigger>
                         <SelectContent className="dark:bg-gray-700">
@@ -1057,7 +1058,7 @@ export default function InventoryManager() {
                         value={selectedMonth}
                         onValueChange={setSelectedMonth}
                       >
-                        <SelectTrigger className="w-[120px] bg-white dark:bg-gray-700">
+                        <SelectTrigger className="w-[120px] bg-white dark:bg-gray-700 dark:border-neutral-400">
                           <SelectValue placeholder="Month" />
                         </SelectTrigger>
                         <SelectContent className="dark:bg-gray-700">
@@ -1137,8 +1138,8 @@ export default function InventoryManager() {
 
             {/* Reports Tab - Updated Layout */}
             <TabsContent value="reports">
-              <Card className="bg-white dark:bg-gray-800 shadow-sm">
-                <CardHeader className="border-b border-gray-200 dark:border-gray-700">
+              <Card className="bg-white dark:bg-gray-800 dark:border-neutral-400 shadow-sm">
+                <CardHeader className="border-b border-gray-200 dark:border-neutral-400">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200">
                       Financial Reports
@@ -1148,7 +1149,7 @@ export default function InventoryManager() {
                         value={selectedYear}
                         onValueChange={setSelectedYear}
                       >
-                        <SelectTrigger className="w-[120px] bg-white dark:bg-gray-700">
+                        <SelectTrigger className="w-[120px] bg-white dark:bg-gray-700 dark:border-neutral-400">
                           <SelectValue placeholder="Year" />
                         </SelectTrigger>
                         <SelectContent className="dark:bg-gray-700">
@@ -1167,7 +1168,7 @@ export default function InventoryManager() {
                         value={selectedMonth}
                         onValueChange={setSelectedMonth}
                       >
-                        <SelectTrigger className="w-[120px] bg-white dark:bg-gray-700">
+                        <SelectTrigger className="w-[120px] bg-white dark:bg-gray-700 dark:border-neutral-400">
                           <SelectValue placeholder="Month" />
                         </SelectTrigger>
                         <SelectContent className="dark:bg-gray-700">
@@ -1193,7 +1194,7 @@ export default function InventoryManager() {
                 <CardContent className="p-4 sm:p-6 space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                     {/* Current Stock Count */}
-                    <Card className="bg-white dark:bg-gray-800 shadow-sm">
+                    <Card className="bg-white dark:bg-gray-800 dark:border-neutral-400 shadow-sm">
                       <CardHeader className="flex items-center gap-2">
                         <Warehouse className="h-6 w-6 text-teal-600 dark:text-teal-400" />
                         <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200">
@@ -1214,7 +1215,7 @@ export default function InventoryManager() {
                     </Card>
 
                     {/* Revenue in Inventory */}
-                    <Card className="bg-white dark:bg-gray-800 shadow-sm">
+                    <Card className="bg-white dark:bg-gray-800 dark:border-neutral-400 shadow-sm">
                       <CardHeader className="flex items-center gap-2">
                         <DollarSign className="h-6 w-6 text-teal-600 dark:text-teal-400" />
                         <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200">
@@ -1239,7 +1240,7 @@ export default function InventoryManager() {
                     </Card>
 
                     {/* Total Items Sold */}
-                    <Card className="bg-white dark:bg-gray-800 shadow-sm">
+                    <Card className="bg-white dark:bg-gray-800 dark:border-neutral-400 shadow-sm">
                       <CardHeader className="flex items-center gap-2">
                         <ShoppingCart className="h-6 w-6 text-teal-600 dark:text-teal-400" />
                         <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200">
@@ -1265,7 +1266,7 @@ export default function InventoryManager() {
                     </Card>
 
                     {/* Gross Income for the Month */}
-                    <Card className="bg-white dark:bg-gray-800 shadow-sm">
+                    <Card className="bg-white dark:bg-gray-800 dark:border-neutral-400 shadow-sm">
                       <CardHeader className="flex items-center gap-2">
                         <ClipboardList className="h-6 w-6 text-teal-600 dark:text-teal-400" />
                         <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200">
@@ -1297,7 +1298,7 @@ export default function InventoryManager() {
                     </Card>
 
                     {/* Total Profit for the Month */}
-                    <Card className="bg-white dark:bg-gray-800 shadow-sm">
+                    <Card className="bg-white dark:bg-gray-800 dark:border-neutral-400 shadow-sm">
                       <CardHeader className="flex items-center gap-2">
                         <DollarSign className="h-6 w-6 text-teal-600 dark:text-teal-400" />
                         <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200">
@@ -1333,8 +1334,8 @@ export default function InventoryManager() {
                   </div>
 
                   {/* Sales Performance Table */}
-                  <Card className="bg-white dark:bg-gray-800 shadow-sm">
-                    <CardHeader className="border-b border-gray-200 dark:border-gray-700">
+                  <Card className="bg-white dark:bg-gray-800 dark:border-neutral-400 shadow-sm">
+                    <CardHeader className="border-b border-gray-200 dark:border-neutral-400">
                       <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200">
                         Sales Performance
                       </CardTitle>
