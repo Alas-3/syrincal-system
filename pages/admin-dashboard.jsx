@@ -79,7 +79,7 @@ const ProductForm = ({ product, onSubmit, buttonText, onCancel }) => {
       <button
         type="button"
         onClick={handleClear}
-        className="absolute top-2 right-2 p-1 text-gray-500 dark:text-neutral-300 hover:text-red-600"
+        className="absolute top-2 right-2 p-1 text-gray-500 dark:text-neutral-300 hover:text-red-600 dark:hover:text-red-600"
       >
         <Trash2 className="h-4 w-4" />
       </button>
@@ -219,7 +219,7 @@ const ProductForm = ({ product, onSubmit, buttonText, onCancel }) => {
 };
 
 // SaleForm Component
-const SaleForm = ({ products, onSubmit, sale }) => {
+const SaleForm = ({ products, onSubmit, sale, onCancel }) => {
   const [selectedProduct, setSelectedProduct] = useState(
     sale?.product_id || ""
   );
@@ -227,8 +227,8 @@ const SaleForm = ({ products, onSubmit, sale }) => {
   const [saleDate, setSaleDate] = useState(
     sale?.sale_date || new Date().toISOString().split("T")[0]
   );
+  const formRef = React.useRef(null);
 
-  // Auto-fill the selected product, custom price, and date when in edit mode
   useEffect(() => {
     if (sale) {
       setSelectedProduct(sale.product_id);
@@ -247,6 +247,15 @@ const SaleForm = ({ products, onSubmit, sale }) => {
     setSaleDate(new Date().toISOString().split("T")[0]); // Reset date to today
   };
 
+  const handleClear = () => {
+    if (formRef.current) {
+      formRef.current.reset();
+      setSelectedProduct("");
+      setCustomPrice("");
+      setSaleDate(new Date().toISOString().split("T")[0]);
+    }
+  };
+
   const product = products.find((p) => p.id === selectedProduct) || {
     remaining: 0,
     vetsprice: 0,
@@ -254,9 +263,19 @@ const SaleForm = ({ products, onSubmit, sale }) => {
 
   return (
     <form
+      ref={formRef}
       onSubmit={handleSubmit}
-      className="space-y-4 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm"
+      className="space-y-4 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm relative"
     >
+      {/* Clear Button */}
+      <button
+        type="button"
+        onClick={handleClear}
+        className="absolute top-2 right-2 p-1 text-gray-500 dark:text-neutral-300 hover:text-red-600 dark:hover:text-red-600"
+      >
+        <Trash2 className="h-4 w-4" />
+      </button>
+
       {/* Product Selection */}
       <div>
         <label
@@ -376,16 +395,11 @@ const SaleForm = ({ products, onSubmit, sale }) => {
         >
           {sale ? "Update Sale" : "Record Sale"}
         </Button>
-        {sale && (
+        {onCancel && (
           <Button
             type="button"
             className="w-full bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-700 text-white"
-            onClick={() => {
-              setSelectedProduct("");
-              setCustomPrice("");
-              setSaleDate(new Date().toISOString().split("T")[0]); // Reset date to today
-              onSubmit(null); // Pass null to indicate cancellation
-            }}
+            onClick={onCancel}
           >
             Cancel
           </Button>
