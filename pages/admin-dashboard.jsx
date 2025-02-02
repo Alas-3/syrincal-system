@@ -79,7 +79,7 @@ const ProductForm = ({ product, onSubmit, buttonText, onCancel }) => {
       <button
         type="button"
         onClick={handleClear}
-        className="absolute top-2 right-2 p-1 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+        className="absolute top-2 right-2 p-1 text-gray-500 dark:text-neutral-300 hover:text-red-600"
       >
         <Trash2 className="h-4 w-4" />
       </button>
