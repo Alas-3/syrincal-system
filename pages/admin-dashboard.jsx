@@ -780,7 +780,7 @@ export default function InventoryManager() {
           {/* Content Sections */}
           <div className="space-y-6">
             {/* Products Tab - Updated Layout */}
-            <TabsContent value="products" className="space-y-6">
+            <TabsContent value="products" className="space-y-6 pb-10">
               <Card className="bg-white dark:bg-gray-800 shadow-sm dark:border-neutral-400">
                 <CardHeader className="border-b border-gray-200 dark:border-neutral-400">
                   <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200">
@@ -801,7 +801,7 @@ export default function InventoryManager() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-white dark:bg-gray-800  dark:border-neutral-400 shadow-sm">
+              <Card className="bg-white dark:bg-gray-800 dark:border-neutral-400 shadow-sm">
                 <CardHeader className="border-b border-gray-200 dark:border-neutral-400">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200">
@@ -924,7 +924,7 @@ export default function InventoryManager() {
             </TabsContent>
 
             {/* Sales Tab - Updated Layout */}
-            <TabsContent value="sales" className="space-y-6">
+            <TabsContent value="sales" className="space-y-6 pb-10">
               {editingSale ? (
                 <Card className="bg-white dark:bg-gray-800 dark:border-neutral-400 shadow-sm">
                   <CardHeader className="border-b border-gray-200 dark:border-neutral-400">
