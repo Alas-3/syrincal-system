@@ -265,12 +265,15 @@ const SaleForm = ({ products, onSubmit, sale, onCancel }) => {
   };
 
   const handleClear = () => {
-    if (formRef.current) {
-      formRef.current.reset();
-      setSelectedProduct("");
-      setCustomPrice("");
-      setSaleDate(new Date().toISOString().split("T")[0]);
-    }
+    setSelectedProduct(""); // Reset product selection
+    setSaleDate(""); // Reset sale date
+    setCustomPrice(""); // Reset custom price
+    formRef.current.reset(); // Reset the form fields
+  };
+  
+  const handleCancel = () => {
+    handleClear(); // Call handleClear to reset everything
+    if (onCancel) onCancel(); // Execute additional onCancel logic if provided
   };
 
   const product = products.find((p) => p.id === selectedProduct) || {
@@ -280,150 +283,150 @@ const SaleForm = ({ products, onSubmit, sale, onCancel }) => {
 
   return (
     <form
-      ref={formRef}
-      onSubmit={handleSubmit}
-      className="space-y-4 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm relative"
+  ref={formRef}
+  onSubmit={handleSubmit}
+  className="space-y-4 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm relative"
+>
+  {/* Clear Button */}
+  <button
+    type="button"
+    onClick={handleClear}
+    className="absolute top-2 right-2 p-1 text-gray-500 dark:text-neutral-300 hover:text-red-600 dark:hover:text-red-600"
+  >
+    <Trash2 className="h-4 w-4" />
+  </button>
+
+  {/* Product Selection */}
+  <div>
+    <label
+      htmlFor="product_id"
+      className="block text-md font-bold text-gray-700 dark:text-gray-200 mb-1"
     >
-      {/* Clear Button */}
-      <button
+      Select Product
+    </label>
+    <Select
+      onValueChange={setSelectedProduct}
+      required
+      name="product_id"
+      value={selectedProduct}
+    >
+      <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+        <SelectValue placeholder="Select a product" />
+      </SelectTrigger>
+      <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
+        {products
+          .filter((p) => p.remaining > 0)
+          .map((p) => (
+            <SelectItem
+              key={p.id}
+              value={p.id}
+              className="dark:hover:bg-gray-600 dark:text-white"
+            >
+              {p.name} (Stock: {p.remaining}) @ ₱{p.vetsprice} - Added on:{" "}
+              {new Date(p.purchase_date).toLocaleDateString()}
+            </SelectItem>
+          ))}
+      </SelectContent>
+    </Select>
+  </div>
+
+  {/* Client Name */}
+  <div>
+    <label
+      htmlFor="client_name"
+      className="block text-md font-bold text-gray-700 dark:text-gray-200 mb-1"
+    >
+      Client Name
+    </label>
+    <Input
+      id="client_name"
+      name="client_name"
+      placeholder="Enter Client Name"
+      defaultValue={sale?.client_name}
+      required
+      className="dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+    />
+  </div>
+
+  {/* Quantity */}
+  <div>
+    <label
+      htmlFor="quantity"
+      className="block text-md font-bold text-gray-700 dark:text-gray-200 mb-1"
+    >
+      Quantity
+    </label>
+    <Input
+      id="quantity"
+      name="quantity"
+      type="number"
+      placeholder="Enter Quantity Sold"
+      defaultValue={sale?.quantity}
+      max={selectedProduct ? products.find(p => p.id === selectedProduct)?.remaining : ""}
+      required
+      className="dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+    />
+  </div>
+
+  {/* Sale Date */}
+  <div>
+    <label
+      htmlFor="sale_date"
+      className="block text-md font-bold text-gray-700 dark:text-gray-200 mb-1"
+    >
+      Sale Date
+    </label>
+    <Input
+      id="sale_date"
+      name="sale_date"
+      type="date"
+      value={saleDate}
+      onChange={(e) => setSaleDate(e.target.value)}
+      required
+      className="dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+    />
+  </div>
+
+  {/* Custom Selling Price */}
+  <div>
+    <label
+      htmlFor="custom_price"
+      className="block text-md font-bold text-gray-700 dark:text-gray-200 mb-1"
+    >
+      Custom Selling Price (Optional)
+    </label>
+    <Input
+      id="custom_price"
+      name="custom_price"
+      type="number"
+      step="0.01"
+      placeholder="Enter Custom Selling Price"
+      value={customPrice}
+      onChange={(e) => setCustomPrice(e.target.value)}
+      className="dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+    />
+  </div>
+
+  {/* Buttons */}
+  <div className="flex gap-2">
+    <Button
+      type="submit"
+      className="w-full bg-teal-500 hover:bg-teal-600 dark:bg-teal-600 dark:hover:bg-teal-700 text-white"
+    >
+      {sale ? "Update Sale" : "Record Sale"}
+    </Button>
+    {/* Show Cancel button only in edit mode */}
+    {onCancel && (
+      <Button
         type="button"
-        onClick={handleClear}
-        className="absolute top-2 right-2 p-1 text-gray-500 dark:text-neutral-300 hover:text-red-600 dark:hover:text-red-600"
+        className="w-full bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-700 text-white"
+        onClick={handleCancel}
       >
-        <Trash2 className="h-4 w-4" />
-      </button>
-
-      {/* Product Selection */}
-      <div>
-        <label
-          htmlFor="product_id"
-          className="block text-md font-bold text-gray-700 dark:text-gray-200 mb-1"
-        >
-          Select Product
-        </label>
-        <Select
-          onValueChange={setSelectedProduct}
-          required
-          name="product_id"
-          value={selectedProduct}
-        >
-          <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-            <SelectValue placeholder="Select a product" />
-          </SelectTrigger>
-          <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
-            {products
-              .filter((p) => p.remaining > 0)
-              .map((p) => (
-                <SelectItem
-                  key={p.id}
-                  value={p.id}
-                  className="dark:hover:bg-gray-600 dark:text-white"
-                >
-                  {p.name} (Stock: {p.remaining}) @ ₱{p.vetsprice} - Added on:{" "}
-                  {new Date(p.purchase_date).toLocaleDateString()}
-                </SelectItem>
-              ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Client Name */}
-      <div>
-        <label
-          htmlFor="client_name"
-          className="block text-md font-bold text-gray-700 dark:text-gray-200 mb-1"
-        >
-          Client Name
-        </label>
-        <Input
-          id="client_name"
-          name="client_name"
-          placeholder="Enter Client Name"
-          defaultValue={sale?.client_name}
-          required
-          className="dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
-        />
-      </div>
-
-      {/* Quantity */}
-      <div>
-        <label
-          htmlFor="quantity"
-          className="block text-md font-bold text-gray-700 dark:text-gray-200 mb-1"
-        >
-          Quantity
-        </label>
-        <Input
-          id="quantity"
-          name="quantity"
-          type="number"
-          placeholder="Enter Quantity Sold"
-          defaultValue={sale?.quantity}
-          max={product.remaining}
-          required
-          className="dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
-        />
-      </div>
-
-      {/* Sale Date */}
-      <div>
-        <label
-          htmlFor="sale_date"
-          className="block text-md font-bold text-gray-700 dark:text-gray-200 mb-1"
-        >
-          Sale Date
-        </label>
-        <Input
-          id="sale_date"
-          name="sale_date"
-          type="date"
-          value={saleDate} // Use value instead of defaultValue
-          onChange={(e) => setSaleDate(e.target.value)} // Update state on change
-          required
-          className="dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
-        />
-      </div>
-
-      {/* Custom Selling Price */}
-      <div>
-        <label
-          htmlFor="custom_price"
-          className="block text-md font-bold text-gray-700 dark:text-gray-200 mb-1"
-        >
-          Custom Selling Price (Optional)
-        </label>
-        <Input
-          id="custom_price"
-          name="custom_price"
-          type="number"
-          step="0.01"
-          placeholder="Enter Custom Selling Price"
-          value={customPrice}
-          onChange={(e) => setCustomPrice(e.target.value)}
-          className="dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
-        />
-      </div>
-
-      {/* Buttons */}
-      <div className="flex gap-2">
-        <Button
-          type="submit"
-          className="w-full bg-teal-500 hover:bg-teal-600 dark:bg-teal-600 dark:hover:bg-teal-700 text-white"
-        >
-          {sale ? "Update Sale" : "Record Sale"}
-        </Button>
-        {/* Show Cancel button only in edit mode */}
-        {onCancel && (
-          <Button
-            type="button"
-            className="w-full bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-700 text-white"
-            onClick={onCancel}
-          >
-            Cancel
-          </Button>
-        )}
-      </div>
-    </form>
+        Cancel
+      </Button>
+    )}
+  </div>
+</form>
   );
 };
 
