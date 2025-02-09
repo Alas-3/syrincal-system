@@ -50,8 +50,22 @@ import { supabase } from "../lib/supabaseClient";
 
 // ProductForm Component
 const ProductForm = ({ product, onSubmit, buttonText, onCancel }) => {
-  const initialDate =
-    product?.purchase_date || new Date().toISOString().split("T")[0];
+    // Initialize state for purchase date
+  const [purchaseDate, setPurchaseDate] = React.useState('');
+
+  // Sync state with product.purchase_date whenever the product changes
+  React.useEffect(() => {
+    if (product && product.purchase_date) {
+      const formattedDate = new Date(product.purchase_date)
+        .toISOString()
+        .split('T')[0];
+      setPurchaseDate(formattedDate);
+    } else {
+      // Default to today's date if no product or purchase_date exists
+      setPurchaseDate(new Date().toISOString().split('T')[0]);
+    }
+  }, [product]);
+
   const formRef = React.useRef(null);
 
   const handleSubmit = (e) => {
@@ -154,14 +168,14 @@ const ProductForm = ({ product, onSubmit, buttonText, onCancel }) => {
           id="purchase_qty"
           name="purchase_qty"
           type="number"
-          placeholder="Enter Quantity"
+          placeholder="Enter Quantity Purchased"
           defaultValue={product?.remaining} // Use remaining stock instead of purchase_qty
           required
           className="dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
         />
       </div>
 
-      {/* Purchase Date */}
+      {/* Purchase Date (controlled) */}
       <div>
         <label
           htmlFor="purchase_date"
@@ -173,11 +187,13 @@ const ProductForm = ({ product, onSubmit, buttonText, onCancel }) => {
           id="purchase_date"
           name="purchase_date"
           type="date"
-          defaultValue={initialDate}
+          value={purchaseDate} // Controlled value
+          onChange={(e) => setPurchaseDate(e.target.value)}
           required
           className="dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
         />
       </div>
+
 
       {/* Supplier */}
       <div>
@@ -341,7 +357,7 @@ const SaleForm = ({ products, onSubmit, sale, onCancel }) => {
           id="quantity"
           name="quantity"
           type="number"
-          placeholder="Enter Quantity"
+          placeholder="Enter Quantity Sold"
           defaultValue={sale?.quantity}
           max={product.remaining}
           required
@@ -858,14 +874,15 @@ export default function InventoryManager() {
                   <div className="overflow-x-auto">
                     <Table className="min-w-[600px]">
                       <TableHeader>
-                        <TableRow>
-                          <TableHead>Product Name</TableHead>
-                          <TableHead>Price</TableHead>
-                          <TableHead>Cost</TableHead>
-                          <TableHead>Stock</TableHead>
-                          <TableHead>Supplier</TableHead>
-                          <TableHead>Actions</TableHead>
-                        </TableRow>
+                      <TableRow>
+    <TableHead>Product Name</TableHead>
+    <TableHead>Price</TableHead>
+    <TableHead>Cost</TableHead>
+    <TableHead>Stock</TableHead>
+    <TableHead>Supplier</TableHead>
+    <TableHead>Purchase Date</TableHead> {/* Added column */}
+    <TableHead>Actions</TableHead>
+  </TableRow>
                       </TableHeader>
                       <TableBody>
                         {products
@@ -893,6 +910,9 @@ export default function InventoryManager() {
                               </TableCell>
                               <TableCell>{product.remaining}</TableCell>
                               <TableCell>{product.suppliername}</TableCell>
+                              <TableCell>
+          {new Date(product.purchase_date).toLocaleDateString()} {/* Formatted date */}
+        </TableCell>
                               <TableCell>
                                 <div className="flex gap-2">
                                   <Button
