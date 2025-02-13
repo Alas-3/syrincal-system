@@ -438,6 +438,7 @@ export default function InventoryManager() {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [editingSale, setEditingSale] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState('all');
   // Add these state variables at the top of the component
   const [selectedProductYear, setSelectedProductYear] = useState(
     new Date().getFullYear()
@@ -703,27 +704,30 @@ export default function InventoryManager() {
 
   const getSalesPerformance = () => {
     const performance = {};
-    getFilteredSales().forEach((sale) => {
-      // Use both name and selling price as the key
-      const key = `${sale.productsdata.name}-${sale.sale_price}`;
-      if (!performance[key]) {
-        performance[key] = {
-          name: sale.productsdata.name,
-          sellingPrice: sale.sale_price, // Selling price per piece
-          acquisitionPrice: sale.productsdata.acq_price_new, // Cost per piece
-          totalSales: 0,
-          totalRevenue: 0,
-          totalCost: 0, // Total cost for all pieces sold
-          totalProfit: 0,
-        };
-      }
-      performance[key].totalSales += sale.quantity;
-      performance[key].totalRevenue += sale.quantity * sale.sale_price;
-      performance[key].totalCost +=
-        sale.quantity * sale.productsdata.acq_price_new; // Total cost
-      performance[key].totalProfit +=
-        (sale.sale_price - sale.productsdata.acq_price_new) * sale.quantity;
-    });
+    getFilteredSales()
+      .filter(sale => 
+        selectedProduct === 'all' || 
+        sale.productsdata.name === selectedProduct
+      )
+      .forEach((sale) => {
+        const key = `${sale.productsdata.name}-${sale.sale_price}`;
+        if (!performance[key]) {
+          performance[key] = {
+            name: sale.productsdata.name,
+            sellingPrice: sale.sale_price,
+            acquisitionPrice: sale.productsdata.acq_price_new,
+            totalSales: 0,
+            totalRevenue: 0,
+            totalCost: 0,
+            totalProfit: 0,
+          };
+        }
+        performance[key].totalSales += sale.quantity;
+        performance[key].totalRevenue += sale.quantity * sale.sale_price;
+        performance[key].totalCost += sale.quantity * sale.productsdata.acq_price_new;
+        performance[key].totalProfit += 
+          (sale.sale_price - sale.productsdata.acq_price_new) * sale.quantity;
+      });
     return Object.values(performance);
   };
 
@@ -1407,12 +1411,39 @@ export default function InventoryManager() {
                   </div>
 
                   {/* Sales Performance Table */}
-                  <Card className="bg-white dark:bg-gray-800 dark:border-neutral-400 shadow-sm">
-                    <CardHeader className="border-b border-gray-200 dark:border-neutral-400">
-                      <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-                        Sales Performance
-                      </CardTitle>
-                    </CardHeader>
+                  {/* Sales Performance Table */}
+<Card className="bg-white dark:bg-gray-800 dark:border-neutral-400 shadow-sm">
+  <CardHeader className="border-b border-gray-200 dark:border-neutral-400">
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+        Sales Performance
+      </CardTitle>
+      <Select
+  value={selectedProduct}
+  onValueChange={setSelectedProduct}
+>
+  <SelectTrigger className="w-[200px] bg-white dark:bg-gray-700 dark:border-neutral-400">
+    <SelectValue placeholder="Filter by product" />
+  </SelectTrigger>
+  <SelectContent className="dark:bg-gray-700">
+    <SelectItem value="all" className="dark:hover:bg-gray-600">
+      None (Show All)
+    </SelectItem>
+    {[...new Set(getFilteredSales().map(sale => sale.productsdata.name))]
+      .sort()
+      .map((name) => (
+        <SelectItem
+          key={name}
+          value={name}
+          className="dark:hover:bg-gray-600"
+        >
+          {name}
+        </SelectItem>
+      ))}
+  </SelectContent>
+</Select>
+    </div>
+  </CardHeader>
                     <CardContent className="p-4 sm:p-6">
                       <div className="overflow-x-auto">
                         <Table className="min-w-[800px]">
