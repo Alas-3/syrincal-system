@@ -50,8 +50,10 @@ import { supabase } from "../lib/supabaseClient";
 
 // ProductForm Component
 const ProductForm = ({ product, onSubmit, buttonText, onCancel }) => {
-    // Initialize state for purchase date
+  // Initialize state for purchase date
   const [purchaseDate, setPurchaseDate] = React.useState('');
+  // Initialize state for expiration date
+  const [expirationDate, setExpirationDate] = React.useState('');
 
   // Sync state with product.purchase_date whenever the product changes
   React.useEffect(() => {
@@ -63,6 +65,18 @@ const ProductForm = ({ product, onSubmit, buttonText, onCancel }) => {
     } else {
       // Default to today's date if no product or purchase_date exists
       setPurchaseDate(new Date().toISOString().split('T')[0]);
+    }
+  }, [product]);
+
+  // Sync state with product.expiration_date whenever the product changes
+  React.useEffect(() => {
+    if (product?.expiration_date) {
+      const formattedDate = new Date(product.expiration_date)
+        .toISOString()
+        .split('T')[0];
+      setExpirationDate(formattedDate);
+    } else {
+      setExpirationDate('');
     }
   }, [product]);
 
@@ -85,153 +99,171 @@ const ProductForm = ({ product, onSubmit, buttonText, onCancel }) => {
 
   return (
     <form
-      ref={formRef}
-      onSubmit={handleSubmit}
-      className="space-y-4 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm relative"
+  ref={formRef}
+  onSubmit={handleSubmit}
+  className="space-y-4 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm relative"
+>
+  {/* Clear Button */}
+  <button
+    type="button"
+    onClick={handleClear}
+    className="absolute top-2 right-2 p-1 text-gray-500 dark:text-neutral-300 hover:text-red-600 dark:hover:text-red-600"
+  >
+    <Trash2 className="h-4 w-4" />
+  </button>
+
+  {/* Product Name */}
+  <div>
+    <label
+      htmlFor="name"
+      className="block text-md font-bold text-gray-700 dark:text-gray-200 mb-1"
     >
-      {/* Clear Button */}
-      <button
+      Product Name
+    </label>
+    <Input
+      id="name"
+      name="name"
+      placeholder="Enter Product Name"
+      defaultValue={product?.name}
+      required
+      className="dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+    />
+  </div>
+
+  {/* Selling Price */}
+  <div>
+    <label
+      htmlFor="vetsprice"
+      className="block text-md font-bold text-gray-700 dark:text-gray-200 mb-1"
+    >
+      Selling Price
+    </label>
+    <Input
+      id="vetsprice"
+      name="vetsprice"
+      type="number"
+      step="0.01"
+      placeholder="Enter Selling Price"
+      defaultValue={product?.vetsprice}
+      required
+      className="dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+    />
+  </div>
+
+  {/* Acquisition Price */}
+  <div>
+    <label
+      htmlFor="acq_price_new"
+      className="block text-md font-bold text-gray-700 dark:text-gray-200 mb-1"
+    >
+      Acquisition Price
+    </label>
+    <Input
+      id="acq_price_new"
+      name="acq_price_new"
+      type="number"
+      step="0.01"
+      placeholder="Enter Acquisition Price"
+      defaultValue={product?.acq_price_new}
+      required
+      className="dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+    />
+  </div>
+
+  {/* Quantity */}
+  <div>
+    <label
+      htmlFor="purchase_qty"
+      className="block text-md font-bold text-gray-700 dark:text-gray-200 mb-1"
+    >
+      Quantity
+    </label>
+    <Input
+      id="purchase_qty"
+      name="purchase_qty"
+      type="number"
+      placeholder="Enter Quantity Purchased"
+      defaultValue={product?.remaining} // Use remaining stock instead of purchase_qty
+      required
+      className="dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+    />
+  </div>
+
+  {/* Purchase Date (controlled) */}
+  <div>
+    <label
+      htmlFor="purchase_date"
+      className="block text-md font-bold text-gray-700 dark:text-gray-200 mb-1"
+    >
+      Purchase Date
+    </label>
+    <Input
+      id="purchase_date"
+      name="purchase_date"
+      type="date"
+      value={purchaseDate} // Controlled value
+      onChange={(e) => setPurchaseDate(e.target.value)}
+      required
+      className="dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+    />
+  </div>
+
+  {/* Expiration Date (Optional) */}
+  <div>
+    <label
+      htmlFor="expiration_date"
+      className="block text-md font-bold text-gray-700 dark:text-gray-200 mb-1"
+    >
+      Expiration Date (Optional)
+    </label>
+    <Input
+      id="expiration_date"
+      name="expiration_date"
+      type="date"
+      value={expirationDate}
+      onChange={(e) => setExpirationDate(e.target.value)}
+      className="dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+    />
+  </div>
+
+  {/* Supplier */}
+  <div>
+    <label
+      htmlFor="suppliername"
+      className="block text-md font-bold text-gray-700 dark:text-gray-200 mb-1"
+    >
+      Supplier
+    </label>
+    <Input
+      id="suppliername"
+      name="suppliername"
+      placeholder="Enter Supplier Name"
+      defaultValue={product?.suppliername}
+      className="dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+    />
+  </div>
+
+  {/* Submit and Cancel Buttons */}
+  <div className="flex gap-2">
+    <Button
+      type="submit"
+      className="w-full bg-teal-500 hover:bg-teal-600 dark:bg-teal-600 dark:hover:bg-teal-700 text-white"
+    >
+      {buttonText}
+    </Button>
+    {/* Show Cancel button only in edit mode */}
+    {onCancel && (
+      <Button
         type="button"
-        onClick={handleClear}
-        className="absolute top-2 right-2 p-1 text-gray-500 dark:text-neutral-300 hover:text-red-600 dark:hover:text-red-600"
+        className="w-full bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-700 text-white"
+        onClick={onCancel}
       >
-        <Trash2 className="h-4 w-4" />
-      </button>
+        Cancel
+      </Button>
+    )}
+  </div>
+</form>
 
-      {/* Product Name */}
-      <div>
-        <label
-          htmlFor="name"
-          className="block text-md font-bold text-gray-700 dark:text-gray-200 mb-1"
-        >
-          Product Name
-        </label>
-        <Input
-          id="name"
-          name="name"
-          placeholder="Enter Product Name"
-          defaultValue={product?.name}
-          required
-          className="dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
-        />
-      </div>
-
-      {/* Selling Price */}
-      <div>
-        <label
-          htmlFor="vetsprice"
-          className="block text-md font-bold text-gray-700 dark:text-gray-200 mb-1"
-        >
-          Selling Price
-        </label>
-        <Input
-          id="vetsprice"
-          name="vetsprice"
-          type="number"
-          step="0.01"
-          placeholder="Enter Selling Price"
-          defaultValue={product?.vetsprice}
-          required
-          className="dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
-        />
-      </div>
-
-      {/* Acquisition Price */}
-      <div>
-        <label
-          htmlFor="acq_price_new"
-          className="block text-md font-bold text-gray-700 dark:text-gray-200 mb-1"
-        >
-          Acquisition Price
-        </label>
-        <Input
-          id="acq_price_new"
-          name="acq_price_new"
-          type="number"
-          step="0.01"
-          placeholder="Enter Acquisition Price"
-          defaultValue={product?.acq_price_new}
-          required
-          className="dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
-        />
-      </div>
-
-      {/* Quantity */}
-      <div>
-        <label
-          htmlFor="purchase_qty"
-          className="block text-md font-bold text-gray-700 dark:text-gray-200 mb-1"
-        >
-          Quantity
-        </label>
-        <Input
-          id="purchase_qty"
-          name="purchase_qty"
-          type="number"
-          placeholder="Enter Quantity Purchased"
-          defaultValue={product?.remaining} // Use remaining stock instead of purchase_qty
-          required
-          className="dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
-        />
-      </div>
-
-      {/* Purchase Date (controlled) */}
-      <div>
-        <label
-          htmlFor="purchase_date"
-          className="block text-md font-bold text-gray-700 dark:text-gray-200 mb-1"
-        >
-          Purchase Date
-        </label>
-        <Input
-          id="purchase_date"
-          name="purchase_date"
-          type="date"
-          value={purchaseDate} // Controlled value
-          onChange={(e) => setPurchaseDate(e.target.value)}
-          required
-          className="dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
-        />
-      </div>
-
-
-      {/* Supplier */}
-      <div>
-        <label
-          htmlFor="suppliername"
-          className="block text-md font-bold text-gray-700 dark:text-gray-200 mb-1"
-        >
-          Supplier
-        </label>
-        <Input
-          id="suppliername"
-          name="suppliername"
-          placeholder="Enter Supplier Name"
-          defaultValue={product?.suppliername}
-          className="dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
-        />
-      </div>
-
-      {/* Submit and Cancel Buttons */}
-      <div className="flex gap-2">
-        <Button
-          type="submit"
-          className="w-full bg-teal-500 hover:bg-teal-600 dark:bg-teal-600 dark:hover:bg-teal-700 text-white"
-        >
-          {buttonText}
-        </Button>
-        {/* Show Cancel button only in edit mode */}
-        {onCancel && (
-          <Button
-            type="button"
-            className="w-full bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-700 text-white"
-            onClick={onCancel}
-          >
-            Cancel
-          </Button>
-        )}
-      </div>
-    </form>
   );
 };
 
@@ -435,17 +467,15 @@ export default function InventoryManager() {
   const [sales, setSales] = useState([]);
   const [editingProduct, setEditingProduct] = useState(null);
   const [activeTab, setActiveTab] = useState("products");
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+  const [selectedYear, setSelectedYear] = useState('all');
+  const [selectedMonth, setSelectedMonth] = useState('all');
   const [editingSale, setEditingSale] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState('all');
   // Add these state variables at the top of the component
-  const [selectedProductYear, setSelectedProductYear] = useState(
-    new Date().getFullYear()
-  );
-  const [selectedProductMonth, setSelectedProductMonth] = useState(
-    new Date().getMonth() + 1
-  );
+  const [selectedProductYear, setSelectedProductYear] = useState('all');
+  const [selectedProductMonth, setSelectedProductMonth] = useState('all');
+  const [selectedSupplier, setSelectedSupplier] = useState('all');
+  const [selectedClient, setSelectedClient] = useState('all');
 
   useEffect(() => {
     fetchProducts();
@@ -481,6 +511,7 @@ export default function InventoryManager() {
       remaining: parseInt(formData.get("purchase_qty"), 10), // Use the same value for remaining
       purchase_date: formData.get("purchase_date"),
       suppliername: formData.get("suppliername"),
+      expiration_date: formData.get("expiration_date") || null,
     };
 
     if (isEditing) {
@@ -664,19 +695,20 @@ export default function InventoryManager() {
     products
       .filter((product) => {
         const purchaseDate = new Date(product.purchase_date);
-        return (
-          purchaseDate.getFullYear() === selectedYear &&
-          purchaseDate.getMonth() + 1 === selectedMonth
-        );
+        const yearMatch = selectedYear === 'all' || 
+          purchaseDate.getFullYear() === parseInt(selectedYear);
+        const monthMatch = selectedMonth === 'all' || 
+          (purchaseDate.getMonth() + 1) === parseInt(selectedMonth);
+        return yearMatch && monthMatch;
       })
       .forEach((product) => {
-        // Include purchase date in the key
-        const key = `${product.id}-${product.name}-${product.acq_price_new}-${product.vetsprice}-${product.purchase_date}`;
+        const key = `${product.id}-${product.name}-${product.acq_price_new}-${product.vetsprice}-${product.purchase_date}-${product.expiration_date}`;
         if (!batches[key]) {
           batches[key] = {
             name: product.name,
             acq_price: product.acq_price_new,
             sell_price: product.vetsprice,
+            expiration_date: product.expiration_date,
             total_stock: 0,
             batches: [],
           };
@@ -685,6 +717,7 @@ export default function InventoryManager() {
         batches[key].batches.push({
           id: product.id,
           purchase_date: product.purchase_date,
+          expiration_date: product.expiration_date,
           quantity: product.remaining,
           supplier: product.suppliername,
         });
@@ -692,23 +725,30 @@ export default function InventoryManager() {
     return Object.values(batches);
   };
 
+  const filterData = (year, month) => {
+    setSelectedYear(year);
+    setSelectedMonth(month);
+  };
+
   const getFilteredSales = () => {
     return sales.filter((sale) => {
       const saleDate = new Date(sale.sale_date);
-      return (
-        saleDate.getFullYear() === selectedYear &&
-        saleDate.getMonth() + 1 === selectedMonth
-      );
+      const yearMatch = selectedYear === 'all' || 
+        saleDate.getFullYear() === parseInt(selectedYear);
+      const monthMatch = selectedMonth === 'all' || 
+        (saleDate.getMonth() + 1) === parseInt(selectedMonth);
+      return yearMatch && monthMatch;
     });
   };
 
   const getSalesPerformance = () => {
     const performance = {};
     getFilteredSales()
-      .filter(sale => 
-        selectedProduct === 'all' || 
-        sale.productsdata.name === selectedProduct
-      )
+      .filter(sale => {
+        const clientMatch = selectedClient === 'all' || sale.client_name === selectedClient;
+        const productMatch = selectedProduct === 'all' || sale.productsdata.name === selectedProduct;
+        return clientMatch && productMatch;
+      })
       .forEach((sale) => {
         const key = `${sale.productsdata.name}-${sale.sale_price}`;
         if (!performance[key]) {
@@ -730,6 +770,7 @@ export default function InventoryManager() {
       });
     return Object.values(performance);
   };
+  
 
   const getYears = () => {
     const years = new Set(
@@ -831,49 +872,57 @@ export default function InventoryManager() {
                       Product List
                     </CardTitle>
                     <div className="flex gap-2">
-                      <Select
-                        value={selectedProductYear}
-                        onValueChange={setSelectedProductYear}
-                      >
-                        <SelectTrigger className="w-[120px] bg-white dark:bg-gray-700 dark:border-neutral-400">
-                          <SelectValue placeholder="Year" />
-                        </SelectTrigger>
-                        <SelectContent className="dark:bg-gray-700">
-                          {getYears().map((year) => (
-                            <SelectItem
-                              key={year}
-                              value={year}
-                              className="dark:hover:bg-gray-600"
-                            >
-                              {year}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <Select
-                        value={selectedProductMonth}
-                        onValueChange={setSelectedProductMonth}
-                      >
-                        <SelectTrigger className="w-[120px] bg-white dark:bg-gray-700 dark:border-neutral-400">
-                          <SelectValue placeholder="Month" />
-                        </SelectTrigger>
-                        <SelectContent className="dark:bg-gray-700">
-                          {getMonths().map((month) => (
-                            <SelectItem
-                              key={month}
-                              value={month}
-                              className="dark:hover:bg-gray-600"
-                            >
-                              {new Date(2023, month - 1).toLocaleString(
-                                "default",
-                                {
-                                  month: "long",
-                                }
-                              )}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                    <Select
+  value={selectedSupplier}
+  onValueChange={setSelectedSupplier}
+>
+  <SelectTrigger className="w-[150px]">
+    <SelectValue placeholder="Supplier" />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value="all">All Suppliers</SelectItem>
+    {[...new Set(products.map(p => p.suppliername).filter(Boolean))].map((supplier) => (
+      <SelectItem key={supplier} value={supplier}>
+        {supplier}
+      </SelectItem>
+    ))}
+  </SelectContent>
+</Select>
+
+                    <Select
+  value={selectedProductYear}
+  onValueChange={setSelectedProductYear}
+>
+  <SelectTrigger className="w-[120px]">
+    <SelectValue placeholder="Year" />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value="all">All Years</SelectItem>
+    {getYears().map((year) => (
+      <SelectItem key={year} value={year.toString()}>
+        {year}
+      </SelectItem>
+    ))}
+  </SelectContent>
+</Select>
+
+<Select
+  value={selectedProductMonth}
+  onValueChange={setSelectedProductMonth}
+>
+  <SelectTrigger className="w-[120px]">
+    <SelectValue placeholder="Month" />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value="all">All Months</SelectItem>
+    {getMonths().map((month) => (
+      <SelectItem key={month} value={month.toString()}>
+        {new Date(0, month - 1).toLocaleString("en", { month: "long" })}
+      </SelectItem>
+    ))}
+  </SelectContent>
+</Select>
+
                     </div>
                   </div>
                 </CardHeader>
@@ -888,22 +937,23 @@ export default function InventoryManager() {
     <TableHead>Stock</TableHead>
     <TableHead>Supplier</TableHead>
     <TableHead>Purchase Date</TableHead> {/* Added column */}
+    <TableHead>Expiration Date</TableHead>
     <TableHead>Actions</TableHead>
   </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {products
-                          .filter((product) => {
-                            const purchaseDate = new Date(
-                              product.purchase_date
-                            );
-                            return (
-                              purchaseDate.getFullYear() ===
-                                selectedProductYear &&
-                              purchaseDate.getMonth() + 1 ===
-                                selectedProductMonth
-                            );
-                          })
+                      {products
+  .filter((product) => {
+    const purchaseDate = new Date(product.purchase_date);
+    const yearMatch = selectedProductYear === 'all' || 
+      purchaseDate.getFullYear() === parseInt(selectedProductYear);
+    const monthMatch = selectedProductMonth === 'all' || 
+      (purchaseDate.getMonth() + 1) === parseInt(selectedProductMonth);
+    const supplierMatch = selectedSupplier === 'all' || 
+      product.suppliername === selectedSupplier;
+    return yearMatch && monthMatch && supplierMatch;
+  })
+  
                           .map((product) => (
                             <TableRow key={product.id}>
                               <TableCell className="font-medium">
@@ -920,6 +970,11 @@ export default function InventoryManager() {
                               <TableCell>
           {new Date(product.purchase_date).toLocaleDateString()} {/* Formatted date */}
         </TableCell>
+        <TableCell>
+  {product.expiration_date 
+    ? new Date(product.expiration_date).toLocaleDateString()
+    : 'N/A'}
+</TableCell>
                               <TableCell>
                                 <div className="flex gap-2">
                                   <Button
@@ -992,49 +1047,56 @@ export default function InventoryManager() {
                     </CardTitle>
                     {/* Month/Year Filter */}
                     <div className="flex gap-2">
-                      <Select
-                        value={selectedYear}
-                        onValueChange={setSelectedYear}
-                      >
-                        <SelectTrigger className="w-[120px] bg-white dark:bg-gray-700 dark:border-neutral-400">
-                          <SelectValue placeholder="Year" />
-                        </SelectTrigger>
-                        <SelectContent className="dark:bg-gray-700">
-                          {getYears().map((year) => (
-                            <SelectItem
-                              key={year}
-                              value={year}
-                              className="dark:hover:bg-gray-600"
-                            >
-                              {year}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <Select
-                        value={selectedMonth}
-                        onValueChange={setSelectedMonth}
-                      >
-                        <SelectTrigger className="w-[120px] bg-white dark:bg-gray-700 dark:border-neutral-400">
-                          <SelectValue placeholder="Month" />
-                        </SelectTrigger>
-                        <SelectContent className="dark:bg-gray-700">
-                          {getMonths().map((month) => (
-                            <SelectItem
-                              key={month}
-                              value={month}
-                              className="dark:hover:bg-gray-600"
-                            >
-                              {new Date(2023, month - 1).toLocaleString(
-                                "default",
-                                {
-                                  month: "long",
-                                }
-                              )}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                    <Select
+  value={selectedClient}
+  onValueChange={setSelectedClient}
+>
+  <SelectTrigger className="w-[150px]">
+    <SelectValue placeholder="Client" />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value="all">All Clients</SelectItem>
+    {[...new Set(sales.map(s => s.client_name).filter(Boolean))].map((client) => (
+      <SelectItem key={client} value={client}>
+        {client}
+      </SelectItem>
+    ))}
+  </SelectContent>
+</Select>
+
+                    <Select
+  value={selectedProductYear}
+  onValueChange={setSelectedProductYear}
+>
+  <SelectTrigger className="w-[120px]">
+    <SelectValue placeholder="Year" />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value="all">All Years</SelectItem>
+    {getYears().map((year) => (
+      <SelectItem key={year} value={year.toString()}>
+        {year}
+      </SelectItem>
+    ))}
+  </SelectContent>
+</Select>
+
+<Select
+  value={selectedProductMonth}
+  onValueChange={setSelectedProductMonth}
+>
+  <SelectTrigger className="w-[120px]">
+    <SelectValue placeholder="Month" />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value="all">All Months</SelectItem>
+    {getMonths().map((month) => (
+      <SelectItem key={month} value={month.toString()}>
+        {new Date(0, month - 1).toLocaleString("en", { month: "long" })}
+      </SelectItem>
+    ))}
+  </SelectContent>
+</Select>
                     </div>
                   </div>
                 </CardHeader>
@@ -1053,14 +1115,17 @@ export default function InventoryManager() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {sales
-                          .filter((sale) => {
-                            const saleDate = new Date(sale.sale_date);
-                            return (
-                              saleDate.getFullYear() === selectedYear &&
-                              saleDate.getMonth() + 1 === selectedMonth
-                            );
-                          })
+                      {sales
+  .filter((sale) => {
+    const saleDate = new Date(sale.sale_date);
+    const yearMatch = selectedYear === 'all' || 
+      saleDate.getFullYear() === parseInt(selectedYear);
+    const monthMatch = selectedMonth === 'all' || 
+      (saleDate.getMonth() + 1) === parseInt(selectedMonth);
+    const clientMatch = selectedClient === 'all' || 
+      sale.client_name === selectedClient;
+    return yearMatch && monthMatch && clientMatch;
+  })
                           .map((sale) => (
                             <TableRow key={sale.id}>
                               <TableCell>
@@ -1112,49 +1177,77 @@ export default function InventoryManager() {
                       Inventory Overview
                     </CardTitle>
                     <div className="flex gap-2">
-                      <Select
-                        value={selectedYear}
-                        onValueChange={setSelectedYear}
-                      >
-                        <SelectTrigger className="w-[120px] bg-white dark:bg-gray-700 dark:border-neutral-400">
-                          <SelectValue placeholder="Year" />
-                        </SelectTrigger>
-                        <SelectContent className="dark:bg-gray-700">
-                          {getYears().map((year) => (
-                            <SelectItem
-                              key={year}
-                              value={year}
-                              className="dark:hover:bg-gray-600"
-                            >
-                              {year}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <Select
-                        value={selectedMonth}
-                        onValueChange={setSelectedMonth}
-                      >
-                        <SelectTrigger className="w-[120px] bg-white dark:bg-gray-700 dark:border-neutral-400">
-                          <SelectValue placeholder="Month" />
-                        </SelectTrigger>
-                        <SelectContent className="dark:bg-gray-700">
-                          {getMonths().map((month) => (
-                            <SelectItem
-                              key={month}
-                              value={month}
-                              className="dark:hover:bg-gray-600"
-                            >
-                              {new Date(2023, month - 1).toLocaleString(
-                                "default",
-                                {
-                                  month: "long",
-                                }
-                              )}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                    <Select
+  value={selectedClient}
+  onValueChange={setSelectedClient}
+>
+  <SelectTrigger className="w-[150px]">
+    <SelectValue placeholder="Filter Client" />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value="all">All Clients</SelectItem>
+    {[...new Set(sales.map(s => s.client_name).filter(Boolean))].map((client) => (
+      <SelectItem key={client} value={client}>
+        {client}
+      </SelectItem>
+    ))}
+  </SelectContent>
+</Select>
+
+                    <Select
+  value={selectedYear}
+  onValueChange={(value) => {
+    setSelectedYear(value);
+    filterData(value, selectedMonth);
+  }}
+>
+  <SelectTrigger className="w-[120px] bg-white dark:bg-gray-700 dark:border-neutral-400">
+    <SelectValue placeholder="Year" />
+  </SelectTrigger>
+  <SelectContent className="dark:bg-gray-700">
+    <SelectItem value="all" className="dark:hover:bg-gray-600">
+      All Years
+    </SelectItem>
+    {getYears().map((year) => (
+      <SelectItem
+        key={year}
+        value={year}
+        className="dark:hover:bg-gray-600"
+      >
+        {year}
+      </SelectItem>
+    ))}
+  </SelectContent>
+</Select>
+
+<Select
+  value={selectedMonth}
+  onValueChange={(value) => {
+    setSelectedMonth(value);
+    filterData(selectedYear, value);
+  }}
+>
+  <SelectTrigger className="w-[120px] bg-white dark:bg-gray-700 dark:border-neutral-400">
+    <SelectValue placeholder="Month" />
+  </SelectTrigger>
+  <SelectContent className="dark:bg-gray-700">
+    <SelectItem value="all" className="dark:hover:bg-gray-600">
+      All Months
+    </SelectItem>
+    {getMonths().map((month) => (
+      <SelectItem
+        key={month}
+        value={month}
+        className="dark:hover:bg-gray-600"
+      >
+        {new Date(2023, month - 1).toLocaleString("default", {
+          month: "long",
+        })}
+      </SelectItem>
+    ))}
+  </SelectContent>
+</Select>
+
                     </div>
                   </div>
                 </CardHeader>
@@ -1168,6 +1261,7 @@ export default function InventoryManager() {
                           <TableHead>Selling Price</TableHead>
                           <TableHead>Remaining Stock</TableHead>
                           <TableHead>Potential Profit</TableHead>
+                          <TableHead>Expiration Date</TableHead>
                           <TableHead>Purchase Batches</TableHead>
                         </TableRow>
                       </TableHeader>
@@ -1191,6 +1285,17 @@ export default function InventoryManager() {
                                 batch.total_stock
                               ).toFixed(2)}
                             </TableCell>
+                            <TableCell>
+  <div className="flex flex-col gap-1">
+    {batch.batches.map((b, i) => (
+      <div key={i} className="text-sm text-gray-500">
+        {b.expiration_date 
+          ? new Date(b.expiration_date).toLocaleDateString()
+          : 'N/A'}
+      </div>
+    ))}
+  </div>
+</TableCell>
                             <TableCell>
                               <div className="flex flex-col gap-1">
                                 {batch.batches.map((b, i) => (
@@ -1222,49 +1327,44 @@ export default function InventoryManager() {
                       Financial Reports
                     </CardTitle>
                     <div className="flex gap-2">
-                      <Select
-                        value={selectedYear}
-                        onValueChange={setSelectedYear}
-                      >
-                        <SelectTrigger className="w-[120px] bg-white dark:bg-gray-700 dark:border-neutral-400">
-                          <SelectValue placeholder="Year" />
-                        </SelectTrigger>
-                        <SelectContent className="dark:bg-gray-700">
-                          {getYears().map((year) => (
-                            <SelectItem
-                              key={year}
-                              value={year}
-                              className="dark:hover:bg-gray-600"
-                            >
-                              {year}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <Select
-                        value={selectedMonth}
-                        onValueChange={setSelectedMonth}
-                      >
-                        <SelectTrigger className="w-[120px] bg-white dark:bg-gray-700 dark:border-neutral-400">
-                          <SelectValue placeholder="Month" />
-                        </SelectTrigger>
-                        <SelectContent className="dark:bg-gray-700">
-                          {getMonths().map((month) => (
-                            <SelectItem
-                              key={month}
-                              value={month}
-                              className="dark:hover:bg-gray-600"
-                            >
-                              {new Date(2023, month - 1).toLocaleString(
-                                "default",
-                                {
-                                  month: "long",
-                                }
-                              )}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                    <Select
+  value={selectedYear}
+  onValueChange={setSelectedYear}
+>
+  <SelectTrigger className="w-[120px] bg-white dark:bg-gray-700 dark:border-neutral-400">
+    <SelectValue placeholder="Year" />
+  </SelectTrigger>
+  <SelectContent className="dark:bg-gray-700">
+    <SelectItem value="all" className="dark:hover:bg-gray-600">
+      All Years
+    </SelectItem>
+    {getYears().map((year) => (
+      <SelectItem key={year} value={year.toString()} className="dark:hover:bg-gray-600">
+        {year}
+      </SelectItem>
+    ))}
+  </SelectContent>
+</Select>
+
+<Select
+  value={selectedMonth}
+  onValueChange={setSelectedMonth}
+>
+  <SelectTrigger className="w-[120px] bg-white dark:bg-gray-700 dark:border-neutral-400">
+    <SelectValue placeholder="Month" />
+  </SelectTrigger>
+  <SelectContent className="dark:bg-gray-700">
+    <SelectItem value="all" className="dark:hover:bg-gray-600">
+      All Months
+    </SelectItem>
+    {getMonths().map((month) => (
+      <SelectItem key={month} value={month.toString()} className="dark:hover:bg-gray-600">
+        {new Date(0, month - 1).toLocaleString("en", { month: "long" })}
+      </SelectItem>
+    ))}
+  </SelectContent>
+</Select>
+
                     </div>
                   </div>
                 </CardHeader>
@@ -1326,14 +1426,15 @@ export default function InventoryManager() {
                       </CardHeader>
                       <CardContent>
                         <div className="text-2xl font-bold">
-                          {sales
-                            .filter((sale) => {
-                              const saleDate = new Date(sale.sale_date);
-                              return (
-                                saleDate.getFullYear() === selectedYear &&
-                                saleDate.getMonth() + 1 === selectedMonth
-                              );
-                            })
+                        {sales
+  .filter((sale) => {
+    const saleDate = new Date(sale.sale_date);
+    const yearMatch = selectedYear === 'all' || 
+      saleDate.getFullYear() === parseInt(selectedYear);
+    const monthMatch = selectedMonth === 'all' || 
+      (saleDate.getMonth() + 1) === parseInt(selectedMonth);
+    return yearMatch && monthMatch;
+  })
                             .reduce((acc, sale) => acc + sale.quantity, 0)}
                         </div>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -1354,19 +1455,16 @@ export default function InventoryManager() {
                         <div className="text-2xl font-bold text-green-600">
                           ₱
                           {sales
-                            .filter((sale) => {
-                              const saleDate = new Date(sale.sale_date);
-                              return (
-                                saleDate.getFullYear() === selectedYear &&
-                                saleDate.getMonth() + 1 === selectedMonth
-                              );
-                            })
-                            .reduce(
-                              (acc, sale) =>
-                                acc + sale.quantity * sale.sale_price,
-                              0
-                            )
-                            .toFixed(2)}
+  .filter((sale) => {
+    const saleDate = new Date(sale.sale_date);
+    const yearMatch = selectedYear === 'all' || 
+      saleDate.getFullYear() === parseInt(selectedYear);
+    const monthMatch = selectedMonth === 'all' || 
+      (saleDate.getMonth() + 1) === parseInt(selectedMonth);
+    return yearMatch && monthMatch;
+  })
+  .reduce((acc, sale) => acc + sale.quantity * sale.sale_price, 0)
+  .toFixed(2)}
                         </div>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
                           Revenue this month
@@ -1386,22 +1484,16 @@ export default function InventoryManager() {
                         <div className="text-2xl font-bold text-green-600">
                           ₱
                           {sales
-                            .filter((sale) => {
-                              const saleDate = new Date(sale.sale_date);
-                              return (
-                                saleDate.getFullYear() === selectedYear &&
-                                saleDate.getMonth() + 1 === selectedMonth
-                              );
-                            })
-                            .reduce(
-                              (acc, sale) =>
-                                acc +
-                                (sale.sale_price -
-                                  sale.productsdata.acq_price_new) *
-                                  sale.quantity,
-                              0
-                            )
-                            .toFixed(2)}
+  .filter((sale) => {
+    const saleDate = new Date(sale.sale_date);
+    const yearMatch = selectedYear === 'all' || 
+      saleDate.getFullYear() === parseInt(selectedYear);
+    const monthMatch = selectedMonth === 'all' || 
+      (saleDate.getMonth() + 1) === parseInt(selectedMonth);
+    return yearMatch && monthMatch;
+  })
+  .reduce((acc, sale) => acc + (sale.sale_price - sale.productsdata.acq_price_new) * sale.quantity, 0)
+  .toFixed(2)}
                         </div>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
                           Profit this month
