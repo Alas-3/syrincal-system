@@ -48,6 +48,73 @@ import { supabase } from "../lib/supabaseClient";
   }}
 />;
 
+// Add these functions before the InventoryManager component
+
+// Utility function to determine expiration status
+const getExpirationStatus = (expirationDate) => {
+  if (!expirationDate) return { status: "none", color: "" };
+  
+  const today = new Date();
+  const expDate = new Date(expirationDate);
+  const diffMonths = (expDate - today) / (1000 * 60 * 60 * 24 * 30.5); // Approximate months
+  
+  if (diffMonths <= 12) {
+    return { 
+      status: "critical", 
+      color: "bg-red-50 dark:bg-red-950 text-red-800 dark:text-red-200" 
+    };
+  } else if (diffMonths <= 18) {
+    return { 
+      status: "warning", 
+      color: "bg-amber-50 dark:bg-amber-950 text-amber-800 dark:text-amber-200" 
+    };
+  } else {
+    return { 
+      status: "good", 
+      color: "bg-green-50 dark:bg-green-950 text-green-800 dark:text-green-200" 
+    };
+  }
+};
+
+// Utility function to get expiration status text
+const getExpirationText = (expirationDate) => {
+  if (!expirationDate) return "No expiration date";
+  
+  const today = new Date();
+  const expDate = new Date(expirationDate);
+  const diffDays = Math.floor((expDate - today) / (1000 * 60 * 60 * 24));
+  
+  if (diffDays < 0) {
+    return `Expired ${Math.abs(diffDays)} days ago`;
+  } else if (diffDays === 0) {
+    return "Expires today!";
+  } else if (diffDays <= 30) {
+    return `Expires in ${diffDays} days`;
+  } else if (diffDays <= 365) {
+    const months = Math.floor(diffDays / 30);
+    return `Expires in ${months} month${months > 1 ? 's' : ''}`;
+  } else {
+    const years = Math.floor(diffDays / 365);
+    const remainingMonths = Math.floor((diffDays % 365) / 30);
+    return `Expires in ${years} year${years > 1 ? 's' : ''}${remainingMonths ? ` and ${remainingMonths} month${remainingMonths > 1 ? 's' : ''}` : ''}`;
+  }
+};
+
+// Update the getExpiringCounts function to accept products as a parameter
+const getExpiringCounts = (products = []) => {
+  const critical = products.filter(p => {
+    if (!p.expiration_date || p.remaining <= 0) return false;
+    return getExpirationStatus(p.expiration_date).status === "critical";
+  }).length;
+  
+  const warning = products.filter(p => {
+    if (!p.expiration_date || p.remaining <= 0) return false;
+    return getExpirationStatus(p.expiration_date).status === "warning";
+  }).length;
+  
+  return { critical, warning };
+};
+
 // ProductForm Component
 const ProductForm = ({ product, onSubmit, buttonText, onCancel }) => {
   // Initialize state for purchase date
@@ -909,7 +976,7 @@ export default function InventoryManager() {
             setEditingSale(null); // Clear sale edit form
           }}
         >
-          <TabsList className="grid grid-cols-2 md:grid-cols-4 w-full md:w-[550px] mb-6 bg-gray-100 dark:bg-gray-800">
+          <TabsList className="grid grid-cols-2 md:grid-cols-5 w-full md:w-[680px] mb-6 bg-gray-100 dark:bg-gray-800">
             <TabsTrigger
               value="products"
               className="data-[state=active]:bg-teal-500 data-[state=active]:text-white"
@@ -927,6 +994,17 @@ export default function InventoryManager() {
               className="data-[state=active]:bg-teal-500 data-[state=active]:text-white"
             >
               <Warehouse className="h-4 w-4 mr-2" /> Inventory
+            </TabsTrigger>
+            <TabsTrigger
+              value="expiring"
+              className="data-[state=active]:bg-teal-500 data-[state=active]:text-white relative"
+            >
+              <Calendar className="h-4 w-4 mr-2" /> Expiring
+              {getExpiringCounts(products).critical > 0 && (
+                <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0">
+                  {getExpiringCounts(products).critical}
+                </Badge>
+              )}
             </TabsTrigger>
             <TabsTrigger
               value="reports"
@@ -1030,18 +1108,17 @@ export default function InventoryManager() {
                 </CardHeader>
                 <CardContent className="p-4 sm:p-6">
                   <div className="overflow-x-auto">
-                    <Table className="min-w-[600px]">
+                    <Table className="min-w-[600px] table-fixed">
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Product Name</TableHead>
-                          <TableHead>Price</TableHead>
-                          <TableHead>Cost</TableHead>
-                          <TableHead>Stock</TableHead>
-                          <TableHead>Supplier</TableHead>
-                          <TableHead>Purchase Date</TableHead>{" "}
-                          {/* Added column */}
-                          <TableHead>Expiration Date</TableHead>
-                          <TableHead>Actions</TableHead>
+                          <TableHead className="w-1/5">Product Name</TableHead>
+                          <TableHead className="w-[10%]">Price</TableHead>
+                          <TableHead className="w-[10%]">Cost</TableHead>
+                          <TableHead className="w-[8%]">Stock</TableHead>
+                          <TableHead className="w-[12%]">Supplier</TableHead>
+                          <TableHead className="w-[12%]">Purchase Date</TableHead>
+                          <TableHead className="w-[15%]">Expiration Date</TableHead>
+                          <TableHead className="w-[10%]">Actions</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -1065,29 +1142,38 @@ export default function InventoryManager() {
                           })
 
                           .map((product) => (
-                            <TableRow key={product.id}>
+                            <TableRow 
+                              key={product.id}
+                              className={getExpirationStatus(product.expiration_date).color}
+                            >
                               <TableCell className="font-medium">
                                 {product.name}
                               </TableCell>
-                              <TableCell>
-                                ₱{product.vetsprice.toFixed(2)}
-                              </TableCell>
-                              <TableCell>
-                                ₱{product.acq_price_new.toFixed(2)}
-                              </TableCell>
+                              <TableCell>₱{product.vetsprice.toFixed(2)}</TableCell>
+                              <TableCell>₱{product.acq_price_new.toFixed(2)}</TableCell>
                               <TableCell>{product.remaining}</TableCell>
                               <TableCell>{product.suppliername}</TableCell>
                               <TableCell>
-                                {new Date(
-                                  product.purchase_date
-                                ).toLocaleDateString()}{" "}
-                                {/* Formatted date */}
+                                {new Date(product.purchase_date).toLocaleDateString()} 
                               </TableCell>
-                              <TableCell>
+                              <TableCell className="py-2">
                                 {product.expiration_date
-                                  ? new Date(
-                                      product.expiration_date
-                                    ).toLocaleDateString()
+                                  ? (
+                                    <div className="flex flex-col">
+                                      <div className="text-sm font-medium">
+                                        {new Date(product.expiration_date).toLocaleDateString()}
+                                      </div>
+                                      {getExpirationStatus(product.expiration_date).status !== "none" && (
+                                        <Badge 
+                                          variant={getExpirationStatus(product.expiration_date).status === "critical" ? "destructive" : 
+                                                  getExpirationStatus(product.expiration_date).status === "warning" ? "warning" : "outline"}
+                                          className="mt-1.5 w-fit text-xs px-2 py-0 h-5"
+                                        >
+                                          {getExpirationText(product.expiration_date)}
+                                        </Badge>
+                                      )}
+                                    </div>
+                                  )
                                   : "N/A"}
                               </TableCell>
                               <TableCell>
@@ -1223,7 +1309,7 @@ export default function InventoryManager() {
                 </CardHeader>
                 <CardContent className="p-4 sm:p-6">
                   <div className="overflow-x-auto">
-                    <Table className="min-w-[600px]">
+                    <Table className="min-w-[600px] table-fixed">
                       <TableHeader>
                         <TableRow>
                           <TableHead>Date Sold</TableHead>
@@ -1390,7 +1476,7 @@ export default function InventoryManager() {
                 </CardHeader>
                 <CardContent className="p-4 sm:p-6">
                   <div className="overflow-x-auto">
-                    <Table className="min-w-[800px]">
+                    <Table className="min-w-[800px] table-fixed">
                       <TableHeader>
                         <TableRow>
                           <TableHead>Product Name</TableHead>
@@ -1406,14 +1492,13 @@ export default function InventoryManager() {
                         {groupInventoryBatches().map((batch) => (
                           <TableRow
                             key={`${batch.name}-${batch.acq_price}-${batch.batches[0].purchase_date}`}
+                            className={batch.expiration_date ? getExpirationStatus(batch.expiration_date).color : ""}
                           >
                             <TableCell className="font-medium">
                               {batch.name}
                             </TableCell>
                             <TableCell>₱{batch.acq_price.toFixed(2)}</TableCell>
-                            <TableCell>
-                              ₱{batch.sell_price.toFixed(2)}
-                            </TableCell>
+                            <TableCell>₱{batch.sell_price.toFixed(2)}</TableCell>
                             <TableCell>{batch.total_stock}</TableCell>
                             <TableCell className="text-green-600">
                               ₱
@@ -1422,17 +1507,28 @@ export default function InventoryManager() {
                                 batch.total_stock
                               ).toFixed(2)}
                             </TableCell>
-                            <TableCell>
-                              <div className="flex flex-col gap-1">
+                            <TableCell className="py-2">
+                              <div className="flex flex-col gap-2">
                                 {batch.batches.map((b, i) => (
                                   <div
                                     key={i}
-                                    className="text-sm text-gray-500"
+                                    className="border-b border-gray-200 dark:border-gray-700 last:border-0 pb-2 last:pb-0"
                                   >
                                     {b.expiration_date
-                                      ? new Date(
-                                          b.expiration_date
-                                        ).toLocaleDateString()
+                                      ? (
+                                        <div className="flex flex-col">
+                                          <div className="text-sm font-medium">
+                                            {new Date(b.expiration_date).toLocaleDateString()}
+                                          </div>
+                                          <Badge
+                                            variant={getExpirationStatus(b.expiration_date).status === "critical" ? "destructive" : 
+                                                   getExpirationStatus(b.expiration_date).status === "warning" ? "warning" : "outline"}
+                                            className="mt-1 w-fit text-xs px-2 py-0 h-5"
+                                          >
+                                            {getExpirationText(b.expiration_date)}
+                                          </Badge>
+                                        </div>
+                                      )
                                       : "N/A"}
                                   </div>
                                 ))}
@@ -1445,14 +1541,96 @@ export default function InventoryManager() {
                                     key={i}
                                     className="text-sm text-gray-500"
                                   >
-                                    {b.quantity} units ({b.purchase_date}){" "}
-                                    {b.supplier && `- ${b.supplier}`}
+                                    {b.quantity} units ({b.purchase_date}) {b.supplier && `- ${b.supplier}`}
                                   </div>
                                 ))}
                               </div>
                             </TableCell>
                           </TableRow>
                         ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Expiring Products Tab */}
+            <TabsContent value="expiring" className="space-y-6 pb-10">
+              <Card className="bg-white dark:bg-gray-800 dark:border-neutral-400 shadow-sm">
+                <CardHeader className="border-b border-gray-200 dark:border-neutral-400">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                      Expiring Products
+                    </CardTitle>
+                    <div className="flex flex-wrap items-center gap-4">
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded-full bg-red-500 dark:bg-red-600 border border-red-600 dark:border-red-500"></div>
+                        <span className="text-sm">Expiring within 1 year</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded-full bg-amber-500 dark:bg-amber-600 border border-amber-600 dark:border-amber-500"></div>
+                        <span className="text-sm">Expiring within 1.5 years</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded-full bg-green-500 dark:bg-green-600 border border-green-600 dark:border-green-500"></div>
+                        <span className="text-sm">Expiring after 2+ years</span>
+                      </div>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-4 sm:p-6">
+                  <div className="overflow-x-auto">
+                    <Table className="min-w-[800px] table-fixed">
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-[20%]">Product Name</TableHead>
+                          <TableHead className="w-[15%]">Expiration Date</TableHead>
+                          <TableHead className="w-[10%]">Remaining Stock</TableHead>
+                          <TableHead className="w-[25%]">Expiration Status</TableHead>
+                          <TableHead className="w-[15%]">Supplier</TableHead>
+                          <TableHead className="w-[15%]">Purchase Date</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {products
+                          .filter(product => product.expiration_date && product.remaining > 0)
+                          .sort((a, b) => new Date(a.expiration_date) - new Date(b.expiration_date))
+                          .map(product => {
+                            const { color, status } = getExpirationStatus(product.expiration_date);
+                            return (
+                              <TableRow 
+                                key={product.id} 
+                                className={color}
+                              >
+                                <TableCell className="font-medium py-3">{product.name}</TableCell>
+                                <TableCell className="py-3">
+                                  {product.expiration_date 
+                                    ? new Date(product.expiration_date).toLocaleDateString()
+                                    : "N/A"}
+                                </TableCell>
+                                <TableCell className="py-3">{product.remaining}</TableCell>
+                                <TableCell className="py-3">
+                                  <div className="flex flex-col">
+                                    <Badge 
+                                      variant={status === "critical" ? "destructive" : 
+                                              status === "warning" ? "warning" : "outline"}
+                                      className="w-fit mb-1 px-2 py-0 h-5"
+                                    >
+                                      {status.charAt(0).toUpperCase() + status.slice(1)}
+                                    </Badge>
+                                    <span className="text-xs mt-1">
+                                      {getExpirationText(product.expiration_date)}
+                                    </span>
+                                  </div>
+                                </TableCell>
+                                <TableCell className="py-3">{product.suppliername || "N/A"}</TableCell>
+                                <TableCell className="py-3">
+                                  {new Date(product.purchase_date).toLocaleDateString()}
+                                </TableCell>
+                              </TableRow>
+                            );
+                          })}
                       </TableBody>
                     </Table>
                   </div>
@@ -1727,7 +1905,7 @@ export default function InventoryManager() {
                     </CardHeader>
                     <CardContent className="p-4 sm:p-6">
                       <div className="overflow-x-auto">
-                        <Table className="min-w-[800px]">
+                        <Table className="min-w-[800px] table-fixed">
                           <TableHeader>
                             <TableRow>
                               <TableHead>Product</TableHead>
