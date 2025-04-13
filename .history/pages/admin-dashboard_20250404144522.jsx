@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Plus,
   Edit,
@@ -39,7 +39,6 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "../lib/supabaseClient";
-import dynamic from 'next/dynamic';
 
 // Wrap your app with the Toaster component
 <Toaster
@@ -48,8 +47,6 @@ import dynamic from 'next/dynamic';
     className: "bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200",
   }}
 />;
-
-const SalesReceipt = dynamic(() => import('../components/SalesReceipt'), { ssr: false });
 
 // Add these functions before the InventoryManager component
 
@@ -634,9 +631,6 @@ export default function InventoryManager() {
   const [selectedProductMonth, setSelectedProductMonth] = useState("all");
   const [selectedSupplier, setSelectedSupplier] = useState("all");
   const [selectedClient, setSelectedClient] = useState("all");
-  const [selectedSales, setSelectedSales] = useState([]);
-  const [showReceipt, setShowReceipt] = useState(false);
-  const [selectedClientName, setSelectedClientName] = useState(null);
 
   useEffect(() => {
     fetchProducts();
@@ -953,46 +947,6 @@ export default function InventoryManager() {
     return Array.from({ length: 12 }, (_, i) => i + 1);
   };
 
-  const handleSaleSelection = (sale) => {
-    // If this is the first selection, set the client name
-    if (selectedSales.length === 0) {
-      setSelectedClientName(sale.client_name);
-    }
-
-    // Check if the sale is already selected
-    const isAlreadySelected = selectedSales.some(s => s.id === sale.id);
-    
-    if (isAlreadySelected) {
-      // If already selected, remove it
-      setSelectedSales(prev => prev.filter(s => s.id !== sale.id));
-      
-      // If we removed all selections, reset the client name
-      if (selectedSales.length === 1) {
-        setSelectedClientName(null);
-      }
-    } else {
-      // Otherwise add it, but only if it matches the client name
-      if (selectedClientName === null || sale.client_name === selectedClientName) {
-        setSelectedSales(prev => [...prev, sale]);
-      }
-    }
-  };
-
-  // Function to check if a sale can be selected (based on client name)
-  const canSelectSale = (sale) => {
-    return selectedClientName === null || sale.client_name === selectedClientName;
-  };
-
-  // Function to handle printing receipt
-  const handlePrintReceipt = () => {
-    setShowReceipt(true);
-  };
-
-  // Function to close the receipt modal
-  const handleCloseReceipt = () => {
-    setShowReceipt(false);
-  };
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1292,16 +1246,8 @@ export default function InventoryManager() {
                     <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200">
                       Sales History
                     </CardTitle>
-                    {/* Add this button when sales are selected */}
-                    <div className="flex gap-2 items-center">
-                      {selectedSales.length > 0 && (
-                        <Button
-                          onClick={handlePrintReceipt}
-                          className="bg-blue-500 hover:bg-blue-600 text-white"
-                        >
-                          Print Receipt ({selectedSales.length})
-                        </Button>
-                      )}
+                    {/* Month/Year Filter */}
+                    <div className="flex gap-2">
                       <Select
                         value={selectedClient}
                         onValueChange={setSelectedClient}
@@ -1392,34 +1338,10 @@ export default function InventoryManager() {
                             return yearMatch && monthMatch && clientMatch;
                           })
                           .map((sale) => (
-                            <TableRow 
-                              key={sale.id} 
-                              className={`cursor-pointer ${
-                                !canSelectSale(sale) ? "opacity-50" : ""
-                              } ${
-                                selectedSales.some(s => s.id === sale.id) ? 
-                                "bg-blue-50 dark:bg-blue-900" : ""
-                              }`}
-                              onClick={() => canSelectSale(sale) && handleSaleSelection(sale)}
-                            >
-                              <TableCell className="py-2">
-                                <div className="flex items-center gap-2">
-                                  <input 
-                                    type="checkbox"
-                                    checked={selectedSales.some(s => s.id === sale.id)}
-                                    onChange={(e) => {
-                                      e.stopPropagation();
-                                      if (canSelectSale(sale)) {
-                                        handleSaleSelection(sale);
-                                      }
-                                    }}
-                                    className="h-4 w-4 rounded border-gray-300"
-                                    disabled={!canSelectSale(sale)}
-                                  />
-                                  {new Date(sale.sale_date).toLocaleDateString()}
-                                </div>
+                            <TableRow key={sale.id}>
+                              <TableCell>
+                                {new Date(sale.sale_date).toLocaleDateString()}
                               </TableCell>
-                              {/* Rest of your existing table cells... */}
                               <TableCell>{sale.client_name}</TableCell>
                               <TableCell>{sale.productsdata?.name}</TableCell>
                               <TableCell>{sale.quantity}</TableCell>
@@ -1435,20 +1357,14 @@ export default function InventoryManager() {
                                     size="sm"
                                     className="dark:bg-neutral-300 text-black"
                                     variant="outline"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setEditingSale(sale);
-                                    }}
+                                    onClick={() => setEditingSale(sale)}
                                   >
                                     <Edit className="h-4 w-4" />
                                   </Button>
                                   <Button
                                     size="sm"
                                     variant="destructive"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleDeleteSale(sale.id);
-                                    }}
+                                    onClick={() => handleDeleteSale(sale.id)} // Call the delete function
                                   >
                                     <Trash2 className="h-4 w-4" />
                                   </Button>
@@ -2041,45 +1957,6 @@ export default function InventoryManager() {
             </TabsContent>
           </div>
         </Tabs>
-
-        {/* Print Receipt Modal */}
-        {showReceipt && (
-          <SalesReceipt
-            selectedSales={selectedSales}
-            clientName={selectedClientName}
-            onClose={handleCloseReceipt}
-          />
-        )}
-
-        {/* Print Styles */}
-        <style jsx global>{`
-          @media print {
-            body * {
-              visibility: hidden;
-            }
-            .receipt-container,
-            .receipt-container * {
-              visibility: visible;
-            }
-            .receipt-container {
-              position: absolute;
-              left: 0;
-              top: 0;
-              width: 100%;
-            }
-            .short-receipt {
-              height: 5.5in;
-              width: 9.5in;
-            }
-            .full-receipt {
-              height: 11in;
-              width: 9.5in;
-            }
-            .print-hidden {
-              display: none;
-            }
-          }
-        `}</style>
       </div>
     </div>
   );

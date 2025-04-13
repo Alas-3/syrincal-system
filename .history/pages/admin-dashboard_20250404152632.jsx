@@ -49,8 +49,6 @@ import dynamic from 'next/dynamic';
   }}
 />;
 
-const SalesReceipt = dynamic(() => import('../components/SalesReceipt'), { ssr: false });
-
 // Add these functions before the InventoryManager component
 
 // Utility function to determine expiration status
