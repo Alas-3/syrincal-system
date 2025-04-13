@@ -76,128 +76,139 @@ const SalesReceipt = ({ selectedSales, onClose, clientName }) => {
 
         {/* Receipt Content - This is what gets printed */}
         <div className={`receipt-content ${isShortReceipt ? 'p-3 short-receipt' : 'p-6 full-receipt'}`}>
-          {/* Receipt Header */}
-          {/* Conditional styling based on receipt size */}
-          <div className={`flex justify-between items-center ${isShortReceipt ? 'mb-0' : 'mb-2'}`}>
-            {/* Company Logo - smaller for short receipt */}
-            <div className="flex-shrink-0">
-              <Image
-                src="/images/syrincalLogo.jpg"
-                alt="Syrincal Trading OPC Logo"
-                width={isShortReceipt ? 100 : 140}
-                height={isShortReceipt ? 46 : 65}
-                className="object-contain"
-                priority
-              />
+          {/* HEADER SECTION */}
+          <div className={`receipt-header-section`}>
+            {/* Logo and company info */}
+            <div className={`flex justify-between items-center ${isShortReceipt ? 'mb-0' : 'mb-2'}`}>
+              <div className="flex-shrink-0">
+                <Image
+                  src="/images/syrincalLogo.jpg"
+                  alt="Syrincal Trading OPC Logo"
+                  width={isShortReceipt ? 100 : 140}
+                  height={isShortReceipt ? 46 : 65}
+                  className="object-contain"
+                  priority
+                />
+              </div>
+              
+              <div className="text-right text-black">
+                <h3 className="text-lg font-bold">SYRINCAL TRADING OPC</h3>
+                {isShortReceipt ? (
+                  <p className="text-sm">123 Business Ave. • Tel: (123) 456-7890</p>
+                ) : (
+                  <>
+                    <p className="text-sm">123 Business Avenue, Your City, State 12345</p>
+                    <p className="text-sm">Tel: (123) 456-7890</p>
+                    <p className="text-sm">Email: contact@syrincaltrading.com</p>
+                  </>
+                )}
+              </div>
             </div>
-            
-            {/* Address - fewer lines for short receipt */}
-            <div className="text-right text-black">
-              <h3 className="text-lg font-bold">SYRINCAL TRADING OPC</h3>
-              {isShortReceipt ? (
-                <p className="text-sm">123 Business Ave. • Tel: (123) 456-7890</p>
-              ) : (
-                <>
-                  <p className="text-sm">123 Business Avenue, Your City, State 12345</p>
-                  <p className="text-sm">Tel: (123) 456-7890</p>
-                  <p className="text-sm">Email: contact@syrincaltrading.com</p>
-                </>
-              )}
+
+            {/* Receipt title */}
+            <div className={`text-center border-b-2 border-t-2 border-black ${isShortReceipt ? 'py-1 mb-2' : 'py-2 mb-4'}`}>
+              <h2 className="text-xl font-bold text-black">DELIVERY RECEIPT</h2>
+            </div>
+
+            {/* Client info and receipt number */}
+            <div className="flex justify-between mb-4 text-black">
+              <div>
+                <p><strong>Client:</strong> {clientName}</p>
+                <p><strong>Date:</strong> {dateDisplay}</p>
+              </div>
+              <div>
+                <p><strong>Receipt #:</strong> {receiptNumber}</p>
+              </div>
             </div>
           </div>
 
-          {/* Receipt Title - smaller padding for short receipt */}
-          <div className={`text-center border-b-2 border-t-2 border-black ${isShortReceipt ? 'py-1 mb-2' : 'py-2 mb-4'}`}>
-            <h2 className="text-xl font-bold text-black">DELIVERY RECEIPT</h2>
-          </div>
-
-          {/* Receipt Details */}
-          <div className="flex justify-between mb-4 text-black">
-            <div>
-              <p><strong>Client:</strong> {clientName}</p>
-              <p><strong>Date:</strong> {dateDisplay}</p>
-            </div>
-            <div>
-              <p><strong>Receipt #:</strong> {receiptNumber}</p>
-            </div>
-          </div>
-
-          {/* Items Table */}
-          <table className={`w-full ${isShortReceipt ? 'mb-3' : 'mb-6'} border-collapse`}>
-            <thead>
-              <tr className="border-b-2 border-black text-left text-black">
-                <th className={`${isShortReceipt ? 'py-1' : 'py-2'} w-[15%]`}>Date</th>
-                <th className={`${isShortReceipt ? 'py-1' : 'py-2'} w-[40%]`}>Item Description</th>
-                <th className={`${isShortReceipt ? 'py-1' : 'py-2'} w-[15%] text-right`}>Unit Price</th>
-                <th className={`${isShortReceipt ? 'py-1' : 'py-2'} w-[10%] text-right`}>Quantity</th>
-                <th className={`${isShortReceipt ? 'py-1' : 'py-2'} w-[20%] text-right`}>Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              {selectedSales.map((sale, index) => (
-                <tr key={index} className="border-b text-black">
-                  <td className={`${isShortReceipt ? 'py-1' : 'py-2'}`}>{formatDate(new Date(sale.sale_date))}</td>
-                  <td className={`${isShortReceipt ? 'py-1' : 'py-2'}`}>{sale.productsdata.name}</td>
-                  <td className={`${isShortReceipt ? 'py-1' : 'py-2'} text-right`}>₱{sale.sale_price.toFixed(2)}</td>
-                  <td className={`${isShortReceipt ? 'py-1' : 'py-2'} text-right`}>{sale.quantity}</td>
-                  <td className={`${isShortReceipt ? 'py-1' : 'py-2'} text-right`}>₱{(sale.quantity * sale.sale_price).toFixed(2)}</td>
+          {/* ITEMS SECTION - This will expand/contract */}
+          <div className="receipt-items-section">
+            <table className={`w-full ${isShortReceipt ? 'mb-3' : 'mb-6'} border-collapse`}>
+              <thead>
+                <tr className="border-b-2 border-black text-left text-black">
+                  <th className={`${isShortReceipt ? 'py-1' : 'py-2'} w-[15%]`}>Date</th>
+                  <th className={`${isShortReceipt ? 'py-1' : 'py-2'} w-[40%]`}>Item Description</th>
+                  <th className={`${isShortReceipt ? 'py-1' : 'py-2'} w-[15%] text-right`}>Unit Price</th>
+                  <th className={`${isShortReceipt ? 'py-1' : 'py-2'} w-[10%] text-right`}>Quantity</th>
+                  <th className={`${isShortReceipt ? 'py-1' : 'py-2'} w-[20%] text-right`}>Amount</th>
                 </tr>
-              ))}
-              <tr className="font-bold text-black">
-                <td colSpan="4" className={`${isShortReceipt ? 'py-1' : 'py-2'} text-right`}>Total:</td>
-                <td className={`${isShortReceipt ? 'py-1' : 'py-2'} text-right`}>₱{totalAmount.toFixed(2)}</td>
-              </tr>
-            </tbody>
-          </table>
-
-          {/* Signatures Section - even more compact for short receipt */}
-          <div className={`flex flex-wrap justify-between ${isShortReceipt ? 'mt-2 pt-0' : 'mt-8 pt-4'} text-black`}>
-            <div className="w-1/3 pr-2 mb-4">
-              <div className="border-t border-black pt-1">
-                <p className={`text-center ${isShortReceipt ? 'text-[10px]' : 'text-sm'}`}>Prepared By</p>
-              </div>
-            </div>
-            <div className="w-1/3 px-2 mb-4">
-              <div className="border-t border-black pt-1">
-                <p className={`text-center ${isShortReceipt ? 'text-[10px]' : 'text-sm'}`}>Delivered By</p>
-              </div>
-            </div>
-            <div className="w-1/3 pl-2 mb-4">
-              <div className="border-t border-black pt-1">
-                <p className={`text-center ${isShortReceipt ? 'text-[10px]' : 'text-sm'}`}>Checked By</p>
-              </div>
-            </div>
+              </thead>
+              <tbody>
+                {selectedSales.map((sale, index) => (
+                  <tr key={index} className="border-b text-black">
+                    <td className={`${isShortReceipt ? 'py-1' : 'py-2'}`}>{formatDate(new Date(sale.sale_date))}</td>
+                    <td className={`${isShortReceipt ? 'py-1' : 'py-2'}`}>{sale.productsdata.name}</td>
+                    <td className={`${isShortReceipt ? 'py-1' : 'py-2'} text-right`}>₱{sale.sale_price.toFixed(2)}</td>
+                    <td className={`${isShortReceipt ? 'py-1' : 'py-2'} text-right`}>{sale.quantity}</td>
+                    <td className={`${isShortReceipt ? 'py-1' : 'py-2'} text-right`}>₱{(sale.quantity * sale.sale_price).toFixed(2)}</td>
+                  </tr>
+                ))}
+                <tr className="font-bold text-black">
+                  <td colSpan="4" className={`${isShortReceipt ? 'py-1' : 'py-2'} text-right`}>Total:</td>
+                  <td className={`${isShortReceipt ? 'py-1' : 'py-2'} text-right`}>₱{totalAmount.toFixed(2)}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
 
-          <div className={`flex justify-between ${isShortReceipt ? 'mt-1' : 'mt-2'} text-black`}>
-            <div className="w-1/2 pr-2">
-              <div className="border-t border-black pt-1">
-                <p className={`text-center ${isShortReceipt ? 'text-[10px]' : 'text-sm'}`}>Received By / Date</p>
+          {/* FOOTER SECTION - Always at bottom */}
+          <div className="receipt-footer-section">
+            {/* Signatures Section */}
+            <div className={`flex flex-wrap justify-between ${isShortReceipt ? 'mt-2 pt-0' : 'mt-8 pt-4'} text-black`}>
+              <div className="w-1/3 pr-2 mb-4">
+                <div className="border-t border-black pt-1">
+                  <p className={`text-center ${isShortReceipt ? 'text-[10px]' : 'text-sm'}`}>Prepared By</p>
+                </div>
+              </div>
+              <div className="w-1/3 px-2 mb-4">
+                <div className="border-t border-black pt-1">
+                  <p className={`text-center ${isShortReceipt ? 'text-[10px]' : 'text-sm'}`}>Delivered By</p>
+                </div>
+              </div>
+              <div className="w-1/3 pl-2 mb-4">
+                <div className="border-t border-black pt-1">
+                  <p className={`text-center ${isShortReceipt ? 'text-[10px]' : 'text-sm'}`}>Checked By</p>
+                </div>
               </div>
             </div>
-            <div className="w-1/2 pl-2">
-              <div className="border-t border-black pt-1">
-                <p className={`text-center ${isShortReceipt ? 'text-[10px]' : 'text-sm'}`}>Authorized Signature</p>
-              </div>
-            </div>
-          </div>
 
-          {/* Official Receipt Statement - even more compact for short receipt */}
-          <div className={`${isShortReceipt ? 'mt-4 text-[9px]' : 'mt-6 text-xs'} text-gray-600`}>
-            <p className="font-bold">Official Receipt Statement:</p>
-            <p>1. This is an official receipt issued by Syrincal Trading OPC. Keep for your records.</p>
-            <p>2. Prices are subject to change and may differ from previous or future transactions.</p>
-            <p>3. Thank you for your valued business!</p>
+            <div className={`flex justify-between ${isShortReceipt ? 'mt-1' : 'mt-2'} text-black`}>
+              <div className="w-1/2 pr-2">
+                <div className="border-t border-black pt-1">
+                  <p className={`text-center ${isShortReceipt ? 'text-[10px]' : 'text-sm'}`}>Received By / Date</p>
+                </div>
+              </div>
+              <div className="w-1/2 pl-2">
+                <div className="border-t border-black pt-1">
+                  <p className={`text-center ${isShortReceipt ? 'text-[10px]' : 'text-sm'}`}>Authorized Signature</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Statement */}
+            <div className={`${isShortReceipt ? 'mt-4 text-[9px]' : 'mt-6 text-xs'} text-gray-600`}>
+              <p className="font-bold">Official Receipt Statement:</p>
+              <p>1. This is an official receipt issued by Syrincal Trading OPC. Keep for your records.</p>
+              <p>2. Prices are subject to change and may differ from previous or future transactions.</p>
+              <p>3. Thank you for your valued business!</p>
+            </div>
           </div>
         </div>
       </div>
-      {/* Updated print styles to prevent right side from being cut off */}
+      {/* Updated print styles with responsive short receipt layout */}
 <style jsx global>{`
   @media print {
     @page {
-      /* Set size based on receipt type, with correct orientation */
-      size: ${isShortReceipt ? '9.5in 5.5in landscape' : '9.5in 11in portrait'};
-      margin: 0.25in 0.5in 0.25in 0.25in; /* Increased right margin */
+      size: ${isShortReceipt ? '9.5in 5.5in landscape' : '9.5in 11in landscape'};
+      margin: ${isShortReceipt ? '0.1in 0' : '0.1in 0'};
+    }
+    
+    html, body {
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: hidden !important;
+      height: 100%;
     }
     
     body * {
@@ -213,29 +224,51 @@ const SalesReceipt = ({ selectedSales, onClose, clientName }) => {
       position: absolute;
       left: 0;
       top: 0;
-      width: 98%; /* Reduced from 100% to prevent overflow */
-      overflow: hidden;
+      width: 100%;
+      height: ${isShortReceipt ? '5.3in' : '10.8in'};
+      overflow: hidden !important;
+      padding: 0 !important;
+      margin: 0 !important;
     }
     
     .receipt-content {
-      page-break-after: avoid;
-      page-break-before: avoid;
       page-break-inside: avoid;
-      max-width: ${isShortReceipt ? '9in' : '8.75in'}; /* Constrain width to fit page */
-      margin: 0 auto; /* Center the content */
-      transform: scale(0.98); /* Slightly reduce scale to ensure fit */
-      transform-origin: top left;
+      page-break-after: always;
+      padding: ${isShortReceipt ? '0.1in 0.1in' : '0.2in 0.1in'} !important;
+      max-width: 8.5in;
+      margin: 0 auto;
+      transform: scale(${isShortReceipt ? '0.9' : '0.92'});
+      transform-origin: top center;
+      
+      /* For short receipts - fixed layout with flexbox */
+      ${isShortReceipt ? `
+        display: flex !important;
+        flex-direction: column !important;
+        height: 5.2in !important;
+        justify-content: space-between !important;
+      ` : ''}
     }
     
-    /* Control table layout for printing */
-    table {
-      table-layout: fixed;
-      width: 100%;
-    }
+    /* For short receipts - create three main sections */
+    ${isShortReceipt ? `
+      .receipt-header-section {
+        flex: 0 0 auto;
+      }
+      
+      .receipt-items-section {
+        flex: 1 1 auto;
+        min-height: 1.5in !important; /* Minimum height for items section */
+        display: flex;
+        flex-direction: column;
+      }
+      
+      .receipt-footer-section {
+        flex: 0 0 auto;
+        margin-top: auto !important; /* Push to bottom */
+      }
+    ` : ''}
     
-    /* Adjust column widths slightly */
-    table th:nth-child(2), table td:nth-child(2) { width: 38%; } /* Reduced item description */
-    table th:nth-child(3), table td:nth-child(3) { width: 16%; } /* Adjusted price column */
+    /* Rest of your styles remain the same */
   }
 `}</style>
     </div>
