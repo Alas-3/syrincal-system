@@ -191,53 +191,57 @@ const SalesReceipt = ({ selectedSales, onClose, clientName }) => {
           </div>
         </div>
       </div>
-      {/* Updated print styles to prevent right side from being cut off */}
-<style jsx global>{`
-  @media print {
-    @page {
-      /* Set size based on receipt type, with correct orientation */
-      size: ${isShortReceipt ? '9.5in 5.5in landscape' : '9.5in 11in portrait'};
-      margin: 0.25in 0.5in 0.25in 0.25in; /* Increased right margin */
-    }
-    
-    body * {
-      visibility: hidden;
-    }
-    
-    .receipt-container,
-    .receipt-container * {
-      visibility: visible;
-    }
-    
-    .receipt-container {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 98%; /* Reduced from 100% to prevent overflow */
-      overflow: hidden;
-    }
-    
-    .receipt-content {
-      page-break-after: avoid;
-      page-break-before: avoid;
-      page-break-inside: avoid;
-      max-width: ${isShortReceipt ? '9in' : '8.75in'}; /* Constrain width to fit page */
-      margin: 0 auto; /* Center the content */
-      transform: scale(0.98); /* Slightly reduce scale to ensure fit */
-      transform-origin: top left;
-    }
-    
-    /* Control table layout for printing */
-    table {
-      table-layout: fixed;
-      width: 100%;
-    }
-    
-    /* Adjust column widths slightly */
-    table th:nth-child(2), table td:nth-child(2) { width: 38%; } /* Reduced item description */
-    table th:nth-child(3), table td:nth-child(3) { width: 16%; } /* Adjusted price column */
-  }
-`}</style>
+      {/* Add this to your global styles */}
+      <style jsx global>{`
+        @media print {
+          @page {
+            size: ${isShortReceipt ? '9.5in 5.5in' : '9.5in 11in'};
+            margin: 0.2in;
+            orientation: landscape;
+          }
+          
+          html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+          }
+          
+          body * {
+            visibility: hidden;
+          }
+          
+          .receipt-container {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            padding: 0;
+            margin: 0;
+          }
+          
+          .receipt-container * {
+            visibility: visible;
+          }
+          
+          .receipt-content {
+            page-break-after: avoid;
+            page-break-before: avoid;
+            page-break-inside: avoid;
+          }
+          
+          .short-receipt {
+            max-height: 5.0in;
+          }
+          
+          .full-receipt {
+            max-height: 10.5in;
+          }
+        }
+      `}</style>
     </div>
   );
 };

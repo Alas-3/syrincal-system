@@ -213,7 +213,7 @@ const SalesReceipt = ({ selectedSales, onClose, clientName }) => {
       position: absolute;
       left: 0;
       top: 0;
-      width: 98%; /* Reduced from 100% to prevent overflow */
+      width: 95%; /* Reduced from 100% to prevent overflow */
       overflow: hidden;
     }
     
